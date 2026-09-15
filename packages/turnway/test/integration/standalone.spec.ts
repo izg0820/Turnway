@@ -28,14 +28,13 @@ describe('Phase 01 — NestJS 없이 사용', () => {
   });
 
   it('참여부터 퇴장까지 모듈 없이 동작', async () => {
-    // Arrange & Act
+
     const pass = await room.service.join(TEST_ROOM_ID, 'user-1');
     const checked = await room.service.check(TEST_ROOM_ID, 'user-1', pass.passId);
     await room.service.runAdmission(TEST_ROOM_ID);
     const admitted = await room.service.assertAdmitted(TEST_ROOM_ID, 'user-1', pass.passId);
     const left = await room.service.leave(TEST_ROOM_ID, 'user-1', pass.passId);
 
-    // Assert
     expect(checked.state).toBe('WAITING');
     expect(admitted.state).toBe('ADMITTED');
     expect(left.state).toBe('LEFT');

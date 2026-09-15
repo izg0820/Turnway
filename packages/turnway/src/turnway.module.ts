@@ -50,7 +50,6 @@ export interface TurnwayModuleAsyncOptions {
 function coreProviders(): Provider[] {
   return [
     {
-      // Invalid configuration fails init right here
       provide: TURNWAY_RESOLVED_OPTIONS,
       useFactory: (options: TurnwayModuleOptions): ResolvedTurnwayOptions =>
         normalizeOptions(options),
@@ -66,7 +65,6 @@ function coreProviders(): Provider[] {
       provide: RedisConnectionRef,
       useFactory: (options: ResolvedTurnwayOptions): RedisConnectionRef => {
         const connection = createRedisConnection(options.redis);
-        // Register the scripts before any service call so the first call already works
         defineScripts(connection.client);
         return connection;
       },
@@ -108,7 +106,6 @@ function coreProviders(): Provider[] {
       ],
     },
     {
-      // The service carries no decorators, so its dependencies are listed here
       provide: TurnwayService,
       useFactory: (
         options: ResolvedTurnwayOptions,

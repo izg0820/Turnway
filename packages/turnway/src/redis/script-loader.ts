@@ -16,7 +16,7 @@ export const ROOM_SCRIPTS = [
 export type RoomScriptName = (typeof ROOM_SCRIPTS)[number];
 export type ScriptName = RoomScriptName | 'register-config';
 
-/** Custom command name registered on ioredis. The prefix avoids clashing with existing commands */
+/** ioredis custom command name in the turnway_ namespace */
 export function commandName(script: ScriptName): string {
   return `turnway_${script.replace(/-/g, '_')}`;
 }
@@ -47,7 +47,7 @@ export function loadScriptSources(dir: string = defaultLuaDir()): Record<ScriptN
 /**
  * Register the scripts as ioredis custom commands.
  * ioredis handles resending when EVALSHA misses.
- * Commands are defined on injected connections too, so the prefix keeps names from colliding.
+ * Registers turnway_* commands on both owned and injected connections.
  */
 export function defineScripts(client: Redis, dir?: string): void {
   const sources = loadScriptSources(dir);
@@ -61,10 +61,7 @@ export function defineScripts(client: Redis, dir?: string): void {
   });
 }
 
-/**
- * Shape ioredis attaches to the client for each command defined with `defineCommand`.
- * The methods do not exist on the `Redis` type, so the lookup needs one narrowing assertion.
- */
+/** Signature of an ioredis command registered with defineCommand() */
 type ScriptCommand = (...params: Array<string | number>) => Promise<string>;
 
 /** Invoke a registered script */

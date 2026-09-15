@@ -50,7 +50,7 @@ export class AdmissionRunner {
 
     const settled = await this.awaitInFlight(timeoutMs);
     if (!settled) {
-      // There is no way to cancel the remaining run, so shutdown proceeds and the fact is recorded
+      // The in-flight Redis command cannot be cancelled
       this.logger.warn('admission tick did not settle before shutdown timeout', { timeoutMs });
     }
   }
@@ -110,7 +110,6 @@ export class AdmissionRunner {
         }
       } catch (error) {
         failed = true;
-        // A background failure is recorded, never treated as a successful admission
         this.logger.error('admission tick failed', {
           roomId: room.roomId,
           error: error instanceof Error ? error.message : String(error),

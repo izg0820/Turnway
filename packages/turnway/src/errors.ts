@@ -1,9 +1,6 @@
 import type { WaitingRoomStatus } from './types/status';
 
-/**
- * Domain error codes.
- * Normal waiting and expiry are reported through check(); only calls that cannot proceed land here.
- */
+/** Error codes for validation, pass access, configuration and storage failures */
 export type WaitingRoomErrorCode =
   | 'INVALID_ARGUMENT'
   | 'ROOM_NOT_REGISTERED'
@@ -89,10 +86,7 @@ export class NotAdmittedError extends WaitingRoomError {
   }
 }
 
-/**
- * Redis access failed.
- * Never reported as a successful check or hidden behind a normal status.
- */
+/** Redis command or reply parsing failure, retaining the original cause */
 export class StorageFailureError extends WaitingRoomError {
   constructor(operation: string, cause: unknown) {
     super('STORAGE_FAILURE', `Waiting room storage operation "${operation}" failed.`, {

@@ -17,8 +17,7 @@ import type {
  * Authenticating the user and passing a trustworthy `userId` is the caller's responsibility.
  * A `passId` is not a credential; ownership is confirmed against Redis state.
  *
- * No NestJS decorators here. The module wires it with useFactory and
- * `createTurnway()` constructs it directly outside NestJS.
+ * Available through TurnwayModule or createTurnway().
  */
 export class TurnwayService {
   constructor(
@@ -83,7 +82,9 @@ export class TurnwayService {
    * Admission check to call right before running protected logic.
    * Neither extends the session nor consumes extra capacity.
    *
-   * @throws NotAdmittedError when there is no live admitted session (carries the current status)
+   * @throws NotAdmittedError if the pass is waiting, left or expired
+   * @throws PassNotFoundError if the pass is missing or has been deleted
+   * @throws PassOwnerMismatchError if the pass belongs to another user
    */
   async assertAdmitted(roomId: string, userId: string, passId: string): Promise<AdmittedStatus> {
     const room = this.requireRoom(roomId);

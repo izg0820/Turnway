@@ -20,10 +20,7 @@ export interface JoinResult {
   reused: boolean;
 }
 
-/**
- * Only calls the Lua scripts and converts their replies.
- * Policy decisions stay inside the scripts; this layer only upholds the error contract.
- */
+/** Redis script calls and conversion to service results and errors */
 export class TurnwayStore {
   private readonly keyCache = new Map<string, RoomKeys>();
 
@@ -42,7 +39,7 @@ export class TurnwayStore {
     return keys;
   }
 
-  /** Run a script. A storage failure propagates and is never disguised as success */
+  /** Run a script, wrapping Redis and reply parsing errors in StorageFailureError */
   private async run<K extends ScriptName>(
     script: K,
     keys: string[],

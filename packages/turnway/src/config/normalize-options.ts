@@ -58,7 +58,7 @@ export function normalizeRoom(room: RoomOptions): ResolvedRoomOptions {
     );
   }
 
-  // Frozen so no caller can reshape admission behaviour after validation
+  // Prevent changes to the configuration registered in Redis
   return Object.freeze({
     roomId: room.roomId,
     capacity: positiveInt(room.capacity, 'capacity'),

@@ -19,15 +19,13 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
   });
 
   it('같은 사용자의 동시 참여가 하나의 유효 대기표로 수렴', async () => {
-    // Arrange
+
     const attempts = 20;
 
-    // Act
     const results = await Promise.all(
       Array.from({ length: attempts }, () => harness.service.join(TEST_ROOM_ID, 'user-1')),
     );
 
-    // Assert
     const passIds = new Set(results.map((status) => status.passId));
     expect(passIds.size).toBe(1);
 
@@ -36,12 +34,11 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
   });
 
   it('서로 다른 사용자 순번이 Redis 처리 순서와 일치', async () => {
-    // Act
+
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     const second = await harness.service.join(TEST_ROOM_ID, 'user-2');
     const third = await harness.service.join(TEST_ROOM_ID, 'user-3');
 
-    // Assert
     expect([first.sequence, second.sequence, third.sequence]).toEqual([1, 2, 3]);
     expect(first).toMatchObject({ state: 'WAITING', position: 1 });
     expect(second).toMatchObject({ state: 'WAITING', position: 2 });
@@ -49,14 +46,13 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
   });
 
   it('동시 참여에서도 순번 중복과 대기 인덱스 누락이 없음', async () => {
-    // Act
+
     const results = await Promise.all(
       Array.from({ length: 30 }, (_, index) =>
         harness.service.join(TEST_ROOM_ID, `user-${index}`),
       ),
     );
 
-    // Assert
     const sequences = results.map((status) => status.sequence).sort((a, b) => a - b);
     expect(new Set(sequences).size).toBe(30);
     expect(sequences).toEqual(Array.from({ length: 30 }, (_, index) => index + 1));
@@ -92,17 +88,15 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
   });
 
   it('종료 후 재참여는 새 대기표와 새 순번을 받고 이전 대기표 청소에 지워지지 않음', async () => {
-    // Arrange
+
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.leave(TEST_ROOM_ID, 'user-1', first.passId);
 
-    // Act
     const second = await harness.service.join(TEST_ROOM_ID, 'user-1');
     // Another expiry and cleanup pass must leave the new pass alive
     await harness.service.runAdmission(TEST_ROOM_ID);
     const checked = await harness.service.check(TEST_ROOM_ID, 'user-1', second.passId);
 
-    // Assert
     expect(second.passId).not.toBe(first.passId);
     expect(second.sequence).toBeGreaterThan(first.sequence);
     expect(checked.state).not.toBe('LEFT');
@@ -112,14 +106,13 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
   });
 
   it('입장한 사용자의 재참여 요청은 기존 입장 세션을 그대로 반환', async () => {
-    // Arrange
+
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.runAdmission(TEST_ROOM_ID);
 
-    // Act: a refresh retries the join
+    // a refresh retries the join
     const rejoined = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
-    // Assert
     expect(rejoined.passId).toBe(pass.passId);
     expect(rejoined.state).toBe('ADMITTED');
     expect((await harness.service.stats(TEST_ROOM_ID)).admitted).toBe(1);
@@ -158,14 +151,13 @@ describe('Phase 02 — 대기 만료', () => {
   });
 
   it('만료 시각이 지난 대기표의 퇴장 요청은 만료로 확정', async () => {
-    // Arrange: cleanup has not run, so the hash still reads WAITING
+    // cleanup has not run, so the hash still reads WAITING
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await sleep(350);
 
-    // Act
     const left = await harness.service.leave(TEST_ROOM_ID, 'user-1', pass.passId);
 
-    // Assert: the leave result never splits into LEFT/EXPIRED based on cleanup order
+    // the leave result never splits into LEFT/EXPIRED based on cleanup order
     expect(left.state).toBe('EXPIRED');
   });
 

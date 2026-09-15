@@ -178,7 +178,7 @@ describe('Phase 04 — 만료된 세션 검증', () => {
 
 describe('Phase 04 — 저장소 장애', () => {
   it('Redis 접근 실패를 입장 성공으로 처리하지 않음', async () => {
-    // Arrange: inject an external connection with the offline queue disabled so failures surface at once
+    // inject an external connection with the offline queue disabled so failures surface at once
     const client = await waitForReady(
       new Redis(REDIS_URL, { enableOfflineQueue: false, maxRetriesPerRequest: 1 }),
     );
@@ -189,10 +189,9 @@ describe('Phase 04 — 저장소 장애', () => {
       await harness.service.runAdmission(TEST_ROOM_ID);
       await harness.service.assertAdmitted(TEST_ROOM_ID, 'user-1', pass.passId);
 
-      // Act: trigger a storage failure
+      // trigger a storage failure
       client.disconnect();
 
-      // Assert
       const error = await harness.service
         .assertAdmitted(TEST_ROOM_ID, 'user-1', pass.passId)
         .catch((caught: unknown) => caught);

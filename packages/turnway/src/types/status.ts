@@ -1,7 +1,4 @@
-/**
- * Discriminated union of pass states.
- * HTTP status codes and framework exceptions are never part of the public contract.
- */
+/** Pass state names */
 export type WaitingRoomState = 'WAITING' | 'ADMITTED' | 'LEFT' | 'EXPIRED';
 
 /** Identity fields shared by every state */
@@ -30,7 +27,7 @@ export interface WaitingStatus extends WaitingPassIdentity {
   expiresAt: number;
 }
 
-/** Holding an admitted session. Capacity is consumed from this state on */
+/** A live admitted session occupying one slot until expiry or departure */
 export interface AdmittedStatus extends WaitingPassIdentity {
   state: 'ADMITTED';
   /** Admission time in epoch ms */
@@ -55,6 +52,7 @@ export interface ExpiredStatus extends WaitingPassIdentity {
   endedAt: number;
 }
 
+/** Pass status, discriminated by the state field */
 export type WaitingRoomStatus = WaitingStatus | AdmittedStatus | LeftStatus | ExpiredStatus;
 
 /** Whether the state is terminal */
@@ -80,7 +78,7 @@ export interface AdmissionRunResult {
   roomId: string;
   /** Users admitted in this run */
   admitted: number;
-  /** Entries expired in this run */
+  /** Expired or stale entries cleaned up in this run, including queue-head cleanup */
   expired: number;
   /** Capacity left after the run */
   availableSlots: number;

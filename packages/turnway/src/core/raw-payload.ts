@@ -83,7 +83,7 @@ export function failureToError(
   });
 }
 
-/** Whether the payload is a failure. Takes `unknown` so callers need no cast */
+/** Identify an error reply by its ok flag */
 export function isFailure(payload: unknown): payload is RawFailurePayload {
   return (payload as { ok?: unknown }).ok === false;
 }

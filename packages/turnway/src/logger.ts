@@ -1,13 +1,13 @@
 import { Logger } from '@nestjs/common';
 import type { WaitingRoomLogger } from './types/options';
 
-/** Append context on one line. Assumes no personal data reaches the log */
+/** Append context as JSON without redacting its fields */
 function format(message: string, context?: Record<string, unknown>): string {
   if (!context || Object.keys(context).length === 0) return message;
   return `${message} ${JSON.stringify(context)}`;
 }
 
-/** NestJS Logger adapter, used when no logger option is given */
+/** Default logger for the NestJS module */
 export function createDefaultLogger(): WaitingRoomLogger {
   const logger = new Logger('Turnway');
 

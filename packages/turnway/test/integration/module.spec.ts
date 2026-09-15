@@ -104,7 +104,7 @@ describe('Phase 01 — 연결 소유권', () => {
   });
 
   it('초기화가 실패해도 소유한 연결을 남기지 않음', async () => {
-    // Arrange: register a different capacity for the same room so init fails
+    // register a different capacity for the same room so init fails
     const keyPrefix = `turnway-init-fail-${randomUUID().slice(0, 8)}`;
     const first = await Test.createTestingModule({
       imports: [TurnwayModule.forRoot(moduleOptions({ keyPrefix }))],
@@ -118,10 +118,9 @@ describe('Phase 01 — 연결 소유권', () => {
     }).compile();
     const connection = second.get(RedisConnectionRef);
 
-    // Act
     await expect(second.init()).rejects.toBeInstanceOf(RoomConfigConflictError);
 
-    // Assert: the shutdown hook is never reached, so the init path must close it
+    // the shutdown hook is never reached, so the init path must close it
     expect(connection.client.status).toBe('end');
 
     const cleanup = new Redis(REDIS_URL);
@@ -151,7 +150,7 @@ describe('Phase 01 — 연결 소유권', () => {
 
 describe('Phase 01 — 클라이언트 키 접두사', () => {
   it('주입한 연결의 keyPrefix 가 다르면 대기열 전체가 분리', async () => {
-    // Arrange: same room id and keyPrefix, only the client prefix differs
+    // same room id and keyPrefix, only the client prefix differs
     const keyPrefix = `turnway-client-prefix-${randomUUID().slice(0, 8)}`;
     const clientA = await waitForReady(new Redis(REDIS_URL, { keyPrefix: 'tenant-a:' }));
     const clientB = await waitForReady(new Redis(REDIS_URL, { keyPrefix: 'tenant-b:' }));
@@ -167,11 +166,11 @@ describe('Phase 01 — 클라이언트 키 접두사', () => {
       await moduleA.init();
       await moduleB.init();
 
-      // Act: join as the same user from both instances
+      // join as the same user from both instances
       const passA = await moduleA.get(TurnwayService).join(TEST_ROOM_ID, 'user-1');
       const passB = await moduleB.get(TurnwayService).join(TEST_ROOM_ID, 'user-1');
 
-      // Assert: passes and user mappings are separated, so neither touches the other's state
+      // passes and user mappings are separated, so neither touches the other's state
       expect(passB.passId).not.toBe(passA.passId);
 
       const stillWaiting = await moduleA
@@ -210,7 +209,7 @@ describe('Phase 01 — 비동기 등록', () => {
   });
 
   it('inject 로 넘긴 토큰이 순서대로 useFactory 인자가 됨', async () => {
-    // Arrange: two providers the factory must receive in order
+    // two providers the factory must receive in order
     const PREFIX = Symbol('PREFIX');
 
     @Module({
@@ -238,7 +237,6 @@ describe('Phase 01 — 비동기 등록', () => {
     }).compile();
     await moduleRef.init();
 
-    // Assert
     expect(received).toEqual([expect.stringContaining('turnway-inject-'), 7]);
 
     const service = moduleRef.get(TurnwayService);

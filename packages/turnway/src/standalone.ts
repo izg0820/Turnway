@@ -20,17 +20,16 @@ export interface Turnway {
 }
 
 /**
- * Build a waiting system without NestJS. Same call for Express, Fastify, Hono, or a plain script.
+ * Create a waiting room service without NestJS.
  *
- * Config registration and worker startup are both done by the time this resolves.
- * A failed start cleans up the connection the library created, then propagates the error.
+ * Registers room configuration and starts the worker if admission.enabled is true.
+ * If configuration registration fails, closes the owned connection and rejects.
  */
 export async function createTurnway(options: TurnwayOptions): Promise<Turnway> {
   const resolved = normalizeOptions(options);
   const logger = resolved.logger ?? createConsoleLogger();
 
   const connection = createRedisConnection(resolved.redis);
-  // Register the scripts up front so the very first call can use them
   defineScripts(connection.client);
 
   const store = new TurnwayStore(connection.client, resolved.keyPrefix);

@@ -1,9 +1,7 @@
 import type { WaitingRoomLogger } from './types/options';
 
 /**
- * Default logger used outside NestJS.
- * warn and error go to stderr so failures are never swallowed silently;
- * debug is dropped. Pass the `logger` option to replace the format.
+ * Default standalone logger. Writes warnings and errors to stderr; ignores debug messages.
  */
 export function createConsoleLogger(): WaitingRoomLogger {
   const write = (level: string, message: string, context?: Record<string, unknown>): void => {

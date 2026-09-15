@@ -1,4 +1,4 @@
--- Read the current waiting state.
+-- Read the current pass state and clean up expired entries.
 -- ARGV: [1] prefix, [2] userId, [3] passId, [4] retentionMs, [5] pruneLimit
 local userId = ARGV[2]
 local passId = ARGV[3]

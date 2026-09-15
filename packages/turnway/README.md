@@ -8,8 +8,8 @@ Ships a NestJS module and a framework-free entry point, so it also runs on Expre
 Hono, or a plain script.
 
 > **Status:** the library core is implemented and covered by unit and real-Redis integration
-> tests. The browser demo app and the load/failure validation described in the project plan are
-> not done yet, and the package is not published to npm.
+> tests. A browser demo and load/failure validation are not yet available, and the package is
+> not published to npm.
 
 ## Install
 
@@ -73,8 +73,8 @@ await turnway.service.join('ticket-sale', userId);
 await turnway.close();
 ```
 
-`createTurnway()` resolves once the config is registered and the admission worker has started, so
-there is no separate start step. It pulls in no NestJS packages. The handle exposes the same
+`createTurnway()` registers the config and starts the admission worker when enabled before
+resolving. It loads no NestJS packages. The handle exposes the same
 `service` described below.
 
 ## Use the service
@@ -113,8 +113,9 @@ State is a discriminated union on `state`: `WAITING`, `ADMITTED`, `LEFT`, `EXPIR
 
 ## Errors
 
-Normal waiting and expiry are returned as state, not thrown. Errors are thrown only when the call
-itself does not hold. Every error extends `WaitingRoomError` and carries a `code`:
+Waiting and expiry are returned as pass states. `assertAdmitted()` throws `NotAdmittedError`
+for a waiting or finished pass; a deleted pass produces `PassNotFoundError`. Every library error
+extends `WaitingRoomError` and carries a `code`:
 
 `INVALID_ARGUMENT`, `ROOM_NOT_REGISTERED`, `ROOM_CONFIG_CONFLICT`, `PASS_NOT_FOUND`,
 `PASS_OWNER_MISMATCH`, `NOT_ADMITTED`, `STORAGE_FAILURE`.

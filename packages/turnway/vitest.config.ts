@@ -5,7 +5,7 @@ export default defineConfig({
     globals: false,
     environment: 'node',
     include: ['test/**/*.spec.ts'],
-    // Integration tests hit a real Redis, so files run serially to avoid key collisions
+    // Run files serially to limit contention on the shared Redis test instance
     fileParallelism: false,
     testTimeout: 20_000,
     hookTimeout: 20_000,

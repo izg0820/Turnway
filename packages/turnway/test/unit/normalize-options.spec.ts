@@ -12,13 +12,11 @@ function baseOptions(): TurnwayModuleOptions {
 
 describe('normalizeRoom', () => {
   it('fills defaults for optional timings', () => {
-    // Arrange
+
     const room = { roomId: 'room-a', capacity: 3 };
 
-    // Act
     const resolved = normalizeRoom(room);
 
-    // Assert
     expect(resolved).toEqual({
       roomId: 'room-a',
       capacity: 3,

@@ -2,11 +2,11 @@ import type { Redis, RedisOptions } from 'ioredis';
 
 /** Configuration for a single room */
 export interface RoomOptions {
-  /** Room identifier. Whitespace and braces are rejected */
+  /** 1–64 characters: letters, digits, dots, underscores or hyphens; first character alphanumeric */
   roomId: string;
   /** Concurrent admission limit, counted in active sessions */
   capacity: number;
-  /** Waiting pass lifetime in ms. Defaults to 60_000 */
+  /** Waiting pass TTL in ms, renewed by heartbeat. Defaults to 60_000 */
   waitingTtlMs?: number;
   /** Admitted session lifetime in ms, extended by heartbeats. Defaults to 60_000 */
   sessionTtlMs?: number;
@@ -16,21 +16,21 @@ export interface RoomOptions {
   finishedRetentionMs?: number;
 }
 
-/**
- * Room configuration with defaults filled in, used internally.
- * Readonly so a caller holding a reference cannot change admission behaviour.
- */
+/** Validated, frozen room configuration with defaults applied */
 export type ResolvedRoomOptions = Readonly<Required<RoomOptions>>;
 
 /** Admission worker configuration */
 export interface AdmissionOptions {
-  /** Start automatically on module init. Defaults to true */
+  /** Start the worker during initialization. Defaults to true */
   enabled?: boolean;
-  /** Run interval in ms. Defaults to 1_000 */
+  /** Delay in ms after each completed run. Defaults to 1_000 */
   intervalMs?: number;
   /** Max users admitted per run. Defaults to 50 */
   batchSize?: number;
-  /** Max expired entries pruned per run. Defaults to 100 */
+  /**
+   * Per-room limit for the initial expiry cleanup. Defaults to 100.
+   * Admission may also remove expired passes while scanning the queue head.
+   */
   expiryScanLimit?: number;
   /** Upper bound of the backoff interval in ms after repeated failures. Defaults to 30_000 */
   maxBackoffMs?: number;
@@ -76,7 +76,7 @@ export interface TurnwayModuleOptions {
   admission?: AdmissionOptions;
   /** Redis key prefix. Defaults to 'wr' */
   keyPrefix?: string;
-  /** Logger. Falls back to the NestJS Logger when omitted */
+  /** Defaults to NestJS Logger in the module, or stderr logging in createTurnway() */
   logger?: WaitingRoomLogger;
 }
 
