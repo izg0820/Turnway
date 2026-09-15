@@ -1,0 +1,19 @@
+{
+  "name": "turnway-workspace",
+  "version": "0.0.0",
+  "private": true,
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "redis:up": "docker compose up -d",
+    "redis:down": "docker compose down",
+    "build": "pnpm --filter turnway build",
+    "test": "pnpm --filter turnway test",
+    "test:unit": "pnpm --filter turnway test:unit",
+    "test:integration": "pnpm --filter turnway test:integration",
+    "typecheck": "pnpm -r typecheck",
+    "demo": "pnpm --filter turnway build && pnpm --filter @turnway/demo start"
+  }
+}
