@@ -1,6 +1,6 @@
 # Turnway
 
-A Redis-backed waiting system for NestJS, provided as a library that manages queues and admits users as capacity becomes available.
+A Redis-backed waiting system for Node.js, provided as a library that manages queues and admits users as capacity becomes available. A NestJS module is included, and a framework-free entry point covers Express, Fastify, Hono, or a plain script.
 
 Users join a queue, check their waiting status, and enter when it is their turn.
 Services control how many users are admitted at once, while the waiting system manages the queue and admission lifecycle.
