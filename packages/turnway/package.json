@@ -1,0 +1,100 @@
+{
+  "name": "turnway",
+  "version": "0.1.0",
+  "description": "Redis-backed virtual waiting room for Node.js: FIFO queue, capacity-gated admission, session TTL and heartbeat. NestJS module included, framework-free entry point available.",
+  "keywords": [
+    "waiting-room",
+    "virtual-waiting-room",
+    "queue",
+    "waiting-queue",
+    "fifo",
+    "admission-control",
+    "capacity",
+    "rate-limiting",
+    "throttle",
+    "redis",
+    "ioredis",
+    "lua",
+    "distributed",
+    "concurrency",
+    "nestjs",
+    "nest",
+    "typescript",
+    "flash-sale",
+    "ticketing",
+    "traffic-spike"
+  ],
+  "license": "MIT",
+  "author": "izg0820",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/izg0820/TurnWay.git",
+    "directory": "packages/turnway"
+  },
+  "homepage": "https://github.com/izg0820/TurnWay#readme",
+  "bugs": {
+    "url": "https://github.com/izg0820/TurnWay/issues"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./standalone": {
+      "types": "./dist/standalone.d.ts",
+      "default": "./dist/standalone.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.build.json && node scripts/copy-lua.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run test/unit",
+    "test:integration": "vitest run test/integration",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0 || ^11.0.0",
+    "@nestjs/core": "^10.0.0 || ^11.0.0",
+    "ioredis": "^5.3.0",
+    "reflect-metadata": "^0.1.13 || ^0.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@nestjs/common": {
+      "optional": true
+    },
+    "@nestjs/core": {
+      "optional": true
+    },
+    "reflect-metadata": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/core": "^11.0.0",
+    "@nestjs/testing": "^11.0.0",
+    "@types/node": "^22.0.0",
+    "ioredis": "^5.4.0",
+    "reflect-metadata": "^0.2.2",
+    "rimraf": "^6.0.1",
+    "rxjs": "^7.8.1",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  }
+}
