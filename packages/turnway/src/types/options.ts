@@ -16,8 +16,11 @@ export interface RoomOptions {
   finishedRetentionMs?: number;
 }
 
-/** Room configuration with defaults filled in, used internally */
-export type ResolvedRoomOptions = Required<RoomOptions>;
+/**
+ * Room configuration with defaults filled in, used internally.
+ * Readonly so a caller holding a reference cannot change admission behaviour.
+ */
+export type ResolvedRoomOptions = Readonly<Required<RoomOptions>>;
 
 /** Admission worker configuration */
 export interface AdmissionOptions {

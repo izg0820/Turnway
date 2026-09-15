@@ -58,7 +58,8 @@ export function normalizeRoom(room: RoomOptions): ResolvedRoomOptions {
     );
   }
 
-  return {
+  // Frozen so no caller can reshape admission behaviour after validation
+  return Object.freeze({
     roomId: room.roomId,
     capacity: positiveInt(room.capacity, 'capacity'),
     waitingTtlMs: positiveInt(room.waitingTtlMs, 'waitingTtlMs', DEFAULT_WAITING_TTL_MS),
@@ -69,7 +70,7 @@ export function normalizeRoom(room: RoomOptions): ResolvedRoomOptions {
       'finishedRetentionMs',
       DEFAULT_FINISHED_RETENTION_MS,
     ),
-  };
+  });
 }
 
 /** Normalize the admission worker configuration */

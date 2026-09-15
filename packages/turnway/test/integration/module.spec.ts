@@ -242,7 +242,7 @@ describe('Phase 01 — 비동기 등록', () => {
     expect(received).toEqual([expect.stringContaining('turnway-inject-'), 7]);
 
     const service = moduleRef.get(TurnwayService);
-    expect(service.getRoomOptions(TEST_ROOM_ID).capacity).toBe(7);
+    expect((await service.stats(TEST_ROOM_ID)).capacity).toBe(7);
 
     const cleanup = new Redis(REDIS_URL);
     await deleteKeys(cleanup, received[0] as string);

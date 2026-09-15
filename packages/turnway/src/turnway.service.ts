@@ -32,10 +32,6 @@ export class TurnwayService {
     return [...this.options.rooms.keys()];
   }
 
-  /** Read a room's configuration */
-  getRoomOptions(roomId: string): ResolvedRoomOptions {
-    return this.requireRoom(roomId);
-  }
 
   /**
    * Join the queue.
