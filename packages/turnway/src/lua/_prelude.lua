@@ -89,31 +89,27 @@ local function snapshot(passId, pass, state, extra)
   return out
 end
 
--- Prune a bounded number of expired entries. The cap keeps script runtime bounded
-local function prune_expired(now, limit, retentionMs)
+-- Remove up to `limit` entries with expiry at or before `now`
+local function prune_index(indexKey, now, limit, retentionMs)
   if limit <= 0 then return 0 end
-  local removed = 0
 
-  local stale = redis.call('ZRANGEBYSCORE', KEY_WAITING_EXPIRY, '-inf', now, 'LIMIT', 0, limit)
+  local stale = redis.call('ZRANGEBYSCORE', indexKey, '-inf', now, 'LIMIT', 0, limit)
   for i = 1, #stale do
     local passId = stale[i]
     local owner = redis.call('HGET', pass_key(passId), 'owner')
     finish_pass(passId, owner or '', 'EXPIRED', now, retentionMs)
-    removed = removed + 1
   end
 
-  local remaining = limit - removed
-  if remaining > 0 then
-    local dead = redis.call('ZRANGEBYSCORE', KEY_ACTIVE, '-inf', now, 'LIMIT', 0, remaining)
-    for i = 1, #dead do
-      local passId = dead[i]
-      local owner = redis.call('HGET', pass_key(passId), 'owner')
-      finish_pass(passId, owner or '', 'EXPIRED', now, retentionMs)
-      removed = removed + 1
-    end
-  end
+  return #stale
+end
 
-  return removed
+-- Clean active entries first, then waiting entries within the remaining budget.
+-- Admission and stats exclude expired sessions even before cleanup.
+local function prune_expired(now, limit, retentionMs)
+  if limit <= 0 then return 0 end
+
+  local removed = prune_index(KEY_ACTIVE, now, limit, retentionMs)
+  return removed + prune_index(KEY_WAITING_EXPIRY, now, limit - removed, retentionMs)
 end
 
 -- Resolve the current state. Past its expiry a pass becomes EXPIRED even before cleanup runs

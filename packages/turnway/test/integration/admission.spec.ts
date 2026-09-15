@@ -11,6 +11,48 @@ function waitingKey(harness: Harness): string {
   return `${harness.keyPrefix}:{${TEST_ROOM_ID}}:waiting`;
 }
 
+describe('Phase 03 — 만료 정리 예산 배분', () => {
+  let harness: Harness;
+
+  beforeEach(async () => {
+    harness = await createHarness({
+      rooms: [testRoom({ capacity: 1, waitingTtlMs: 400, sessionTtlMs: 300 })],
+      // Limit cleanup to one entry so expired data remains during admission
+      admission: { enabled: false, batchSize: 10, expiryScanLimit: 1 },
+    });
+  });
+
+  afterEach(async () => {
+    await harness.close();
+  });
+
+  it('만료된 대기표가 쌓여 있어도 만료된 입장 세션이 정원을 계속 점유하지 않음', async () => {
+    // one admitted session, one live waiter at the head, two stale waiters behind it
+    const admitted = await harness.service.join(TEST_ROOM_ID, 'user-a');
+    await harness.service.runAdmission(TEST_ROOM_ID);
+
+    const live = await harness.service.join(TEST_ROOM_ID, 'user-b');
+    await harness.service.join(TEST_ROOM_ID, 'user-c');
+    await harness.service.join(TEST_ROOM_ID, 'user-d');
+
+    // Keep the head alive while everything else ages out
+    await sleep(200);
+    await harness.service.heartbeat(TEST_ROOM_ID, 'user-b', live.passId);
+    await sleep(250);
+
+    // the session expired long ago, so its slot must come back
+    const result = await harness.service.runAdmission(TEST_ROOM_ID);
+
+    expect(result.admitted).toBe(1);
+    expect((await harness.service.check(TEST_ROOM_ID, 'user-b', live.passId)).state).toBe(
+      'ADMITTED',
+    );
+    expect(
+      (await harness.service.check(TEST_ROOM_ID, 'user-a', admitted.passId)).state,
+    ).toBe('EXPIRED');
+  });
+});
+
 describe('Phase 03 — 입장과 정원', () => {
   let harness: Harness;
 
@@ -23,15 +65,13 @@ describe('Phase 03 — 입장과 정원', () => {
   });
 
   it('정원만큼만 선착순으로 입장', async () => {
-    // Arrange — capacity 2
+    // capacity 2
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     const second = await harness.service.join(TEST_ROOM_ID, 'user-2');
     const third = await harness.service.join(TEST_ROOM_ID, 'user-3');
 
-    // Act
     const result = await harness.service.runAdmission(TEST_ROOM_ID);
 
-    // Assert
     expect(result.admitted).toBe(2);
     expect(result.availableSlots).toBe(0);
     expect((await harness.service.check(TEST_ROOM_ID, 'user-1', first.passId)).state).toBe(
@@ -59,7 +99,7 @@ describe('Phase 03 — 입장과 정원', () => {
   });
 
   it('여러 인스턴스가 동시에 승급해도 정원 초과와 순서 역전 없음', async () => {
-    // Arrange: a second instance sharing the same room
+    // a second instance sharing the same room
     const shared = await createHarness({ keyPrefix: harness.keyPrefix });
 
     try {
@@ -68,7 +108,7 @@ describe('Phase 03 — 입장과 정원', () => {
         joined.push(await harness.service.join(TEST_ROOM_ID, `user-${index}`));
       }
 
-      // Act: four promotion requests run concurrently across the two instances
+      // four promotion requests run concurrently across the two instances
       const results = await Promise.all([
         harness.service.runAdmission(TEST_ROOM_ID),
         shared.service.runAdmission(TEST_ROOM_ID),
@@ -76,7 +116,6 @@ describe('Phase 03 — 입장과 정원', () => {
         shared.service.runAdmission(TEST_ROOM_ID),
       ]);
 
-      // Assert
       const total = results.reduce((sum, result) => sum + result.admitted, 0);
       expect(total).toBe(2);
       expect(await harness.redis.zcard(activeKey(harness))).toBe(2);
@@ -246,7 +285,7 @@ describe('Phase 03 — 배치 제한과 백그라운드 작업', () => {
     });
 
     try {
-      // Arrange: six expired passes stacked ahead of one live waiter
+      // six expired passes stacked ahead of one live waiter
       const stale = [];
       for (let index = 1; index <= 6; index += 1) {
         stale.push(await harness.service.join(TEST_ROOM_ID, `stale-${index}`));
@@ -257,7 +296,7 @@ describe('Phase 03 — 배치 제한과 백그라운드 작업', () => {
       }
       const valid = await harness.service.join(TEST_ROOM_ID, 'user-valid');
 
-      // Act: a single run cannot prune them all
+      // a single run cannot prune them all
       const first = await harness.service.runAdmission(TEST_ROOM_ID);
       expect(first.admitted).toBe(0);
       expect(first.expired).toBeLessThanOrEqual(3);
@@ -270,7 +309,6 @@ describe('Phase 03 — 배치 제한과 백그라운드 작업', () => {
         runs += 1;
       }
 
-      // Assert
       expect(admittedTotal).toBe(1);
       expect(await harness.redis.zcard(activeKey(harness))).toBe(1);
       expect((await harness.service.check(TEST_ROOM_ID, 'user-valid', valid.passId)).state).toBe(

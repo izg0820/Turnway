@@ -11,8 +11,9 @@ local pruneLimit = tonumber(ARGV[7])
 local now = now_ms()
 local expired = prune_expired(now, pruneLimit, retention)
 
--- Incomplete cleanup inflates the active count and admits fewer users. Overshooting capacity is never allowed
-local activeCount = redis.call('ZCARD', KEY_ACTIVE)
+-- Count unexpired sessions, as in stats.lua; pending cleanup does not consume capacity.
+local liveBound = string.format('(%d', now)
+local activeCount = redis.call('ZCOUNT', KEY_ACTIVE, liveBound, '+inf')
 local free = capacity - activeCount
 
 if free <= 0 then
@@ -70,7 +71,7 @@ while admitted < take and scanned < scanLimit do
   end
 end
 
-local remaining = capacity - redis.call('ZCARD', KEY_ACTIVE)
+local remaining = capacity - redis.call('ZCOUNT', KEY_ACTIVE, liveBound, '+inf')
 if remaining < 0 then remaining = 0 end
 
 return reply({
