@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { assertIdentifier, buildRoomKeys, passKey, userKey } from '../../src/redis/keys';
+import { assertIdentifier, buildRoomKeys } from '../../src/redis/keys';
 import { InvalidArgumentError } from '../../src/errors';
 
 describe('buildRoomKeys', () => {
@@ -28,16 +28,6 @@ describe('buildRoomKeys', () => {
     expect(keys.config).toBe('wr:{room-a}:config');
     // The prefix travelling as ARGV is never rewritten, so it is composed here
     expect(keys.prefix).toBe('app:wr:{room-a}:');
-    expect(passKey(keys.prefix, 'p1')).toBe('app:wr:{room-a}:pass:p1');
-  });
-});
-
-describe('pass and user keys', () => {
-  it('derives keys from the room prefix', () => {
-    const { prefix } = buildRoomKeys('wr', 'room-a');
-
-    expect(passKey(prefix, 'p1')).toBe('wr:{room-a}:pass:p1');
-    expect(userKey(prefix, 'u1')).toBe('wr:{room-a}:user:u1');
   });
 });
 

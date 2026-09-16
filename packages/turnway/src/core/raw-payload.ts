@@ -20,7 +20,6 @@ export interface RawStatusPayload {
   admittedAt?: number;
   sessionEndsAt?: number;
   endedAt?: number;
-  reused?: boolean;
 }
 
 export interface RawFailurePayload {
@@ -49,19 +48,6 @@ export interface RawStatsPayload {
 /** Config registration result, as returned by register-config.lua */
 export interface RawConfigPayload {
   applied: boolean;
-}
-
-/** Every shape a script can reply with. Keep in step with the Lua sources */
-export type RawPayload =
-  | RawStatusPayload
-  | RawFailurePayload
-  | RawAdmissionPayload
-  | RawStatsPayload
-  | RawConfigPayload;
-
-/** Parse a Lua reply */
-export function parsePayload(raw: string): RawPayload {
-  return JSON.parse(raw) as RawPayload;
 }
 
 /** Turn a failure payload into a domain error */

@@ -82,10 +82,5 @@ export interface ScriptContract {
   };
 }
 
-/** Compile-time check that every registered script has a contract entry */
-type AssertComplete = ScriptName extends keyof ScriptContract ? true : never;
-const _complete: AssertComplete = true;
-void _complete;
-
 export type ScriptArgs<K extends ScriptName> = ScriptContract[K]['args'];
 export type ScriptReply<K extends ScriptName> = ScriptContract[K]['reply'];

@@ -36,7 +36,7 @@ export async function createTurnway(options: TurnwayOptions): Promise<Turnway> {
   const runner = new AdmissionRunner(store, resolved.rooms, resolved.admission, logger);
   const runtime = new TurnwayRuntime(resolved, store, runner, connection, logger);
 
-  await runtime.start();
+  await runtime.onModuleInit();
 
   return {
     service: new TurnwayService(resolved, store, runner),

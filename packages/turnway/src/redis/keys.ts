@@ -50,16 +50,6 @@ export function buildRoomKeys(
   };
 }
 
-/** Pass hash key */
-export function passKey(prefix: string, passId: string): string {
-  return `${prefix}pass:${passId}`;
-}
-
-/** User to current pass mapping key */
-export function userKey(prefix: string, userId: string): string {
-  return `${prefix}user:${userId}`;
-}
-
 /** Validate an externally supplied identifier and reject values that break the key layout */
 export function assertIdentifier(value: unknown, field: string): string {
   if (typeof value !== 'string' || value.length === 0) {

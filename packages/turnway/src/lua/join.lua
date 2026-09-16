@@ -18,7 +18,6 @@ if existingId then
     local state = resolve_state(existingId, pass, now, retention)
     -- A live pass means a retry or refresh, so return it unchanged
     if state['state'] == 'WAITING' or state['state'] == 'ADMITTED' then
-      state['reused'] = true
       return reply(state)
     end
   end
@@ -54,5 +53,4 @@ return reply({
   joinedAt = now,
   position = (rank or 0) + 1,
   expiresAt = expiresAt,
-  reused = false,
 })

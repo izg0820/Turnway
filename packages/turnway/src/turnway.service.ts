@@ -41,8 +41,7 @@ export class TurnwayService {
     const room = this.requireRoom(roomId);
     assertIdentifier(userId, 'userId');
 
-    const result = await this.store.join(room, userId, randomUUID(), this.pruneLimit);
-    return result.status;
+    return this.store.join(room, userId, randomUUID(), this.pruneLimit);
   }
 
   /** Read the waiting state, position, and expiry */

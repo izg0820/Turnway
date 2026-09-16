@@ -8,17 +8,10 @@ import type { AdmissionRunResult, WaitingRoomStats, WaitingRoomStatus } from '..
 import {
   failureToError,
   isFailure,
-  parsePayload,
   toStatus,
   type RawFailurePayload,
   type RawStatusPayload,
 } from './raw-payload';
-
-export interface JoinResult {
-  status: WaitingRoomStatus;
-  /** True when an existing live pass was returned unchanged */
-  reused: boolean;
-}
 
 /** Redis script calls and conversion to service results and errors */
 export class TurnwayStore {
@@ -47,7 +40,7 @@ export class TurnwayStore {
   ): Promise<ScriptReply<K>> {
     try {
       const raw = await callScript(this.client, script, keys, args);
-      return parsePayload(raw) as ScriptReply<K>;
+      return JSON.parse(raw) as ScriptReply<K>;
     } catch (error) {
       if (error instanceof WaitingRoomError) throw error;
       throw new StorageFailureError(script, error);
@@ -78,7 +71,7 @@ export class TurnwayStore {
     userId: string,
     passId: string,
     pruneLimit: number,
-  ): Promise<JoinResult> {
+  ): Promise<WaitingRoomStatus> {
     const { keys, prefix } = this.roomKeyArgs(room.roomId);
     const payload = await this.run('join', keys, [
       prefix,
@@ -90,7 +83,7 @@ export class TurnwayStore {
     ]);
 
     const status = this.unwrapStatus(payload, { roomId: room.roomId, userId, passId });
-    return { status: toStatus(room.roomId, status), reused: status.reused === true };
+    return toStatus(room.roomId, status);
   }
 
   /** Read the current status */

@@ -5,7 +5,7 @@
   "description": "Minimal NestJS app that installs and injects the turnway waiting room module",
   "main": "dist/main.js",
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.json",
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc -p tsconfig.json",
     "start": "pnpm build && node dist/main.js",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -19,7 +19,6 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "rimraf": "^6.0.1",
     "typescript": "^5.6.0"
   }
 }

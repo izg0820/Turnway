@@ -23,7 +23,6 @@ import type {
   WaitingRoomLogger,
   TurnwayModuleOptions,
 } from './types/options';
-import { TurnwayCoordinator } from './turnway.coordinator';
 import { TurnwayService } from './turnway.service';
 
 /** Contract for a class that supplies options during async registration */
@@ -114,7 +113,6 @@ function coreProviders(): Provider[] {
       ): TurnwayService => new TurnwayService(options, store, runner),
       inject: [TURNWAY_RESOLVED_OPTIONS, TurnwayStore, AdmissionRunner],
     },
-    TurnwayCoordinator,
   ];
 }
 
