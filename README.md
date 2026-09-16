@@ -28,7 +28,7 @@ Join → Wait → Get admitted → Access the service → Leave or expire
 ```
 
 1. A user joins and receives a waiting pass.
-2. While waiting, the user can check their queue position and status.
+2. While waiting, the application checks the user's status and sends heartbeats to keep the pass valid.
 3. When a slot becomes available, the next user receives permission to enter.
 4. The service checks that permission before granting access.
 5. Departure or session expiry frees a slot for the next waiting user.
@@ -36,9 +36,25 @@ Join → Wait → Get admitted → Access the service → Leave or expire
 Redis stores queue order and active sessions. The design uses sorted sets to track them
 and Lua scripts to update queue and admission state atomically.
 
+Waiting passes expire after 60 seconds by default unless renewed by a heartbeat. Checking status
+does not renew a pass. Once an admitted session expires, it no longer counts toward capacity,
+even if its stored data has not been cleaned up yet.
+
+## Application responsibilities
+
+Turnway maintains queue order, limits active sessions, and verifies pass ownership and admission.
+Each user ID can hold one live pass per room.
+
+Applications are responsible for authentication, bot protection, and preventing abuse through
+multiple accounts. Derive `userId` from the authenticated user rather than accepting an arbitrary
+ID from the client. Run participation checks before calling `join()`, and call `assertAdmitted()`
+before protected work.
+
+See the [package README](packages/turnway/README.md) for setup, session settings, and integration.
+
 ## Current boundaries
 
 - Capacity is measured in active user sessions, not requests per second.
 - A disconnected user may hold a slot until their session expires.
-- Admission follows arrival order; bot detection and multi-account abuse prevention are outside the current scope.
+- Admission follows the order in which joins are processed by Redis.
 - The initial design targets a single Redis instance. Reliability, failure recovery, and performance have not yet been validated.
