@@ -31,7 +31,6 @@ if status == 'WAITING' then
 
   local nextExpiry = now + waitingTtl
   redis.call('ZADD', KEY_WAITING_EXPIRY, nextExpiry, passId)
-  redis.call('HSET', pKey, 'expiresAt', nextExpiry)
   redis.call('PEXPIRE', pKey, waitingTtl + retention)
   redis.call('SET', user_key(userId), passId, 'PX', waitingTtl + retention)
 
@@ -60,7 +59,6 @@ if status == 'ADMITTED' then
   end
 
   redis.call('ZADD', KEY_ACTIVE, nextExpiry, passId)
-  redis.call('HSET', pKey, 'expiresAt', nextExpiry)
   redis.call('PEXPIRE', pKey, (nextExpiry - now) + retention)
   redis.call('SET', user_key(userId), passId, 'PX', (nextExpiry - now) + retention)
 

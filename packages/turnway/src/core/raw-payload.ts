@@ -25,8 +25,6 @@ export interface RawStatusPayload {
 export interface RawFailurePayload {
   ok: false;
   code: string;
-  /** Fields that disagree on a config conflict */
-  conflicts?: string[];
   /** Config already applied in Redis on a conflict */
   current?: Record<string, string>;
 }

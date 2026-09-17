@@ -1,3 +1,4 @@
+import { setTimeout as sleep } from 'node:timers/promises';
 import { describe, expect, it, vi } from 'vitest';
 import { AdmissionRunner } from '../../src/admission/admission-runner';
 import type { TurnwayStore } from '../../src/core/turnway.store';
@@ -26,10 +27,6 @@ function admissionOptions(overrides: Partial<ResolvedAdmissionOptions> = {}): Re
 
 function fakeStore(promote: TurnwayStore['promote']): TurnwayStore {
   return { promote } as unknown as TurnwayStore;
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 describe('AdmissionRunner', () => {

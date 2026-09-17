@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { Test, type TestingModule } from '@nestjs/testing';
 import { Redis } from 'ioredis';
 import { TurnwayModule } from '../../src/turnway.module';
@@ -98,6 +99,4 @@ export async function waitForReady(client: Redis, timeoutMs = 5_000): Promise<Re
   }
 }
 
-export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+export { sleep };

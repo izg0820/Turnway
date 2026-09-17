@@ -62,7 +62,6 @@ while admitted < take and scanned < scanLimit do
     redis.call('HSET', pKey,
       'status', 'ADMITTED',
       'admittedAt', now,
-      'expiresAt', sessionExpiry,
       'sessionEndsAt', deadline)
     redis.call('PEXPIRE', pKey, maxSessionDuration + retention)
     redis.call('SET', user_key(owner), passId, 'PX', maxSessionDuration + retention)

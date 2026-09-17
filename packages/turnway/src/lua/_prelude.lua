@@ -26,12 +26,8 @@ local function reply(payload)
   return cjson.encode(payload)
 end
 
-local function fail(code, extra)
-  local out = { ok = false, code = code }
-  if extra then
-    for k, v in pairs(extra) do out[k] = v end
-  end
-  return reply(out)
+local function fail(code)
+  return reply({ ok = false, code = code })
 end
 
 -- Read the pass hash. nil when it does not exist

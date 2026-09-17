@@ -35,8 +35,7 @@ redis.call('HSET', pKey,
   'owner', userId,
   'status', 'WAITING',
   'seq', seq,
-  'joinedAt', now,
-  'expiresAt', expiresAt)
+  'joinedAt', now)
 redis.call('PEXPIRE', pKey, waitingTtl + retention)
 redis.call('SET', uKey, newPassId, 'PX', waitingTtl + retention)
 redis.call('ZADD', KEY_WAITING, seq, newPassId)

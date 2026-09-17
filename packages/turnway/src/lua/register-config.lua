@@ -13,20 +13,19 @@ for i = 1, #existing, 2 do
   current[existing[i]] = existing[i + 1]
 end
 
-local conflicts = {}
+local conflict = false
 for i = 1, #ARGV, 2 do
   local field = ARGV[i]
   local value = ARGV[i + 1]
   if current[field] ~= value then
-    conflicts[#conflicts + 1] = field
+    conflict = true
   end
 end
 
-if #conflicts > 0 then
+if conflict then
   return cjson.encode({
     ok = false,
     code = 'ROOM_CONFIG_CONFLICT',
-    conflicts = conflicts,
     current = current,
   })
 end

@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NotAdmittedError, TurnwayService, isWaitingRoomError } from 'turnway';
@@ -52,10 +53,6 @@ async function bootstrap(): Promise<void> {
 /** Stand-in for real booking or payment work, showing only the admission result */
 function runProtectedWork(userId: string): string {
   return `protected-work-done-for-${userId}`;
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 void bootstrap();

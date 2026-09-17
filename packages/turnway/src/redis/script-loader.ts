@@ -21,17 +21,13 @@ export function commandName(script: ScriptName): string {
   return `turnway_${script.replace(/-/g, '_')}`;
 }
 
-/** Lua directory shipped with the build output */
-export function defaultLuaDir(): string {
-  return join(__dirname, '..', 'lua');
-}
-
 function read(dir: string, name: string): string {
   return readFileSync(join(dir, `${name}.lua`), 'utf8');
 }
 
 /** Return the script sources with the prelude merged in */
-export function loadScriptSources(dir: string = defaultLuaDir()): Record<ScriptName, string> {
+export function loadScriptSources(): Record<ScriptName, string> {
+  const dir = join(__dirname, '..', 'lua');
   const prelude = read(dir, '_prelude');
   const sources = {} as Record<ScriptName, string>;
 
@@ -49,8 +45,8 @@ export function loadScriptSources(dir: string = defaultLuaDir()): Record<ScriptN
  * ioredis handles resending when EVALSHA misses.
  * Registers turnway_* commands on both owned and injected connections.
  */
-export function defineScripts(client: Redis, dir?: string): void {
-  const sources = loadScriptSources(dir);
+export function defineScripts(client: Redis): void {
+  const sources = loadScriptSources();
 
   for (const name of ROOM_SCRIPTS) {
     client.defineCommand(commandName(name), { numberOfKeys: 4, lua: sources[name] });
