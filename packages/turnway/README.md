@@ -8,7 +8,8 @@ Ships a NestJS module and a framework-free entry point, so it also runs on Expre
 Hono, or a plain script.
 
 > **Status:** the library core is implemented and covered by unit and real-Redis integration
-> tests. A browser demo and load/failure validation are not yet available, and the package is
+> tests. Room-level Redis Cluster tests and a local load-testing script are available.
+> The browser demo and production failure validation remain incomplete, and the package is
 > not published to npm.
 
 ## Install
@@ -170,15 +171,68 @@ Derive `userId` from the authenticated request on every call. A `passId` identif
 possession of it does not authenticate the caller. Verify admission with `assertAdmitted()` on
 the server before protected work, even if the client previously received an admitted status.
 
+## Redis Cluster
+
+Use `startupNodes` to distribute rooms across Redis Cluster nodes. The NestJS module and
+standalone entry point accept the same configuration.
+
+```ts
+const turnway = await createTurnway({
+  redis: {
+    startupNodes: [
+      { host: '127.0.0.1', port: 6401 },
+      { host: '127.0.0.1', port: 6402 },
+      { host: '127.0.0.1', port: 6403 },
+    ],
+    options: { redisOptions: { connectTimeout: 5000 } },
+  },
+  rooms: [
+    { roomId: 'concert-a', capacity: 500 },
+    { roomId: 'concert-b', capacity: 500 },
+  ],
+});
+```
+
+You can also inject an existing ioredis Cluster with `redis: { client }`. Turnway closes only
+connections it creates; the caller owns injected connections. By default, Cluster discovery
+retries up to three times before initialization fails. Override this policy with
+`options.clusterRetryStrategy`.
+
+Room keys share a `{roomId}` hash tag, keeping admission order, capacity, and ownership checks
+atomic within one slot. Different rooms are distributed according to the Cluster slot map;
+multiple rooms may share a node. A single room is not split across nodes. Applications choose
+the appropriate `roomId` for each user. Capacity remains per room; there is no global capacity
+or global user-count limit.
+
+A Cluster client's `keyPrefix` must not contain braces, which would override the room hash tag.
+Lua scripts access dynamic pass and user keys within the same slot. Online resharding, failover,
+and data-loss guarantees have not been validated; test slot migration separately before using
+it in production.
+
+Start the local three-master Cluster and run its tests:
+
+```sh
+pnpm redis:cluster:up
+pnpm test:cluster
+pnpm build
+node packages/turnway/scripts/load-500k.mjs --cluster
+pnpm redis:cluster:down
+```
+
+This Compose setup runs three Redis processes in one container, exposed only on localhost.
+It has no replicas and is intended for local distribution tests, not production high availability.
+The load script registers 500,000 users across 30 rooms with a one-hour TTL and calls the library
+directly. Measure capacity separately with production TTLs and the complete HTTP request path.
+
 ## Current boundaries
 
 - Capacity is measured in active sessions, not requests per second.
 - A disconnected user holds a slot until the session expires.
 - Admission follows the order in which joins are processed by Redis.
-- Targets a single Redis instance. Redis Cluster is not supported.
+- Supports standalone Redis and room-level Redis Cluster distribution. Each room stays in one slot.
 - `position` is an upper bound: expired waiters that have not been cleaned up yet can still be
   counted ahead of you.
-- Throughput has not been measured. Treat the default timings as starting points.
+- Tune default timings after measuring your application's polling and heartbeat load.
 
 ## Redis requirements
 

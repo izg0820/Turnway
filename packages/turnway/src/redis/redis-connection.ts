@@ -1,5 +1,5 @@
-import { Redis, type RedisOptions } from 'ioredis';
-import type { RedisConnectionOptions } from '../types/options';
+import { Cluster, Redis, type RedisOptions } from 'ioredis';
+import type { RedisClient, RedisConnectionOptions } from '../types/options';
 
 /**
  * Redis connection and its ownership.
@@ -7,7 +7,7 @@ import type { RedisConnectionOptions } from '../types/options';
  */
 export class RedisConnectionRef {
   constructor(
-    readonly client: Redis,
+    readonly client: RedisClient,
     readonly owned: boolean,
   ) {}
 
@@ -64,6 +64,15 @@ export function createRedisConnection(options: RedisConnectionOptions): RedisCon
 
   // A lower retry count so a storage failure is not held onto for long. Callers may override it
   const defaults: RedisOptions = { maxRetriesPerRequest: 3 };
+
+  if ('startupNodes' in options) {
+    return new RedisConnectionRef(new Cluster(options.startupNodes, {
+      // Bound reconnect attempts for queued commands when all nodes are unavailable
+      clusterRetryStrategy: (times) => times <= 3 ? times * 100 : null,
+      ...options.options,
+      redisOptions: { ...defaults, ...options.options?.redisOptions },
+    }), true);
+  }
 
   if ('url' in options && options.url) {
     return new RedisConnectionRef(new Redis(options.url, { ...defaults, ...options.options }), true);

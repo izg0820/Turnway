@@ -9,10 +9,13 @@
   "scripts": {
     "redis:up": "docker compose up -d",
     "redis:down": "docker compose down",
+    "redis:cluster:up": "docker compose -f docker-compose.cluster.yml up -d --wait",
+    "redis:cluster:down": "docker compose -f docker-compose.cluster.yml down",
     "build": "pnpm --filter turnway build",
     "test": "pnpm --filter turnway test",
     "test:unit": "pnpm --filter turnway test:unit",
     "test:integration": "pnpm --filter turnway test:integration",
+    "test:cluster": "pnpm --filter turnway test:cluster",
     "typecheck": "pnpm -r typecheck",
     "demo": "pnpm --filter turnway build && pnpm --filter @turnway/demo start"
   }

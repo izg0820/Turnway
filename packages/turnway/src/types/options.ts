@@ -1,4 +1,6 @@
-import type { Redis, RedisOptions } from 'ioredis';
+import type { Cluster, ClusterNode, ClusterOptions, Redis, RedisOptions } from 'ioredis';
+
+export type RedisClient = Redis | Cluster;
 
 /** Configuration for a single room */
 export interface RoomOptions {
@@ -40,7 +42,7 @@ export type ResolvedAdmissionOptions = Required<AdmissionOptions>;
 
 /** Inject an existing ioredis connection. The caller keeps ownership */
 export interface ExistingRedisConnection {
-  client: Redis;
+  client: RedisClient;
 }
 
 /** Create a connection from a URL. The library owns it and closes it on shutdown */
@@ -54,8 +56,15 @@ export interface RedisOptionsConnection {
   options: RedisOptions;
 }
 
+/** Create an owned Cluster connection with per-room hash slots */
+export interface RedisClusterConnection {
+  startupNodes: ClusterNode[];
+  options?: ClusterOptions;
+}
+
 export type RedisConnectionOptions =
   | ExistingRedisConnection
+  | RedisClusterConnection
   | RedisUrlConnection
   | RedisOptionsConnection;
 

@@ -2,8 +2,8 @@ import { InvalidArgumentError } from '../errors';
 import { MAX_ID_LENGTH } from '../config/defaults';
 
 /**
- * Per-room key prefix.
- * The braces group the keys visually and do not imply Redis Cluster support.
+ * Per-room key prefix
+ * Keep all keys for a room in the same Redis Cluster hash slot
  */
 export function roomPrefix(keyPrefix: string, roomId: string): string {
   return `${keyPrefix}:{${roomId}}:`;

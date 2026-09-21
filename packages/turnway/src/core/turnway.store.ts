@@ -1,4 +1,4 @@
-import type { Redis } from 'ioredis';
+import type { RedisClient } from '../types/options';
 import { RoomConfigConflictError, StorageFailureError, WaitingRoomError } from '../errors';
 import { buildRoomKeys, type RoomKeys } from '../redis/keys';
 import { callScript, type ScriptName } from '../redis/script-loader';
@@ -18,7 +18,7 @@ export class TurnwayStore {
   private readonly keyCache = new Map<string, RoomKeys>();
 
   constructor(
-    private readonly client: Redis,
+    private readonly client: RedisClient,
     private readonly keyPrefix: string,
   ) {}
 

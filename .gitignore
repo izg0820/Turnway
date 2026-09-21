@@ -7,3 +7,5 @@ coverage/
 *.tgz
 
 .idea
+.DS_Store
+graphify-out

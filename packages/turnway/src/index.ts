@@ -13,6 +13,8 @@ export {
 
 export type {
   AdmissionOptions,
+  RedisClient,
+  RedisClusterConnection,
   RedisConnectionOptions,
   ResolvedRoomOptions,
   ResolvedTurnwayOptions,

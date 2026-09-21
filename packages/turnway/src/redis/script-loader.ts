@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Redis } from 'ioredis';
+import type { RedisClient } from '../types/options';
 
 /** Scripts that touch room state. Each is loaded with the shared prelude prepended */
 export const ROOM_SCRIPTS = [
@@ -45,7 +45,7 @@ export function loadScriptSources(): Record<ScriptName, string> {
  * ioredis handles resending when EVALSHA misses.
  * Registers turnway_* commands on both owned and injected connections.
  */
-export function defineScripts(client: Redis): void {
+export function defineScripts(client: RedisClient): void {
   const sources = loadScriptSources();
 
   for (const name of ROOM_SCRIPTS) {
@@ -62,13 +62,13 @@ type ScriptCommand = (...params: Array<string | number>) => Promise<string>;
 
 /** Invoke a registered script */
 export function callScript(
-  client: Redis,
+  client: RedisClient,
   script: ScriptName,
   keys: string[],
   args: Array<string | number>,
 ): Promise<string> {
   const command = commandName(script);
-  const invoke = (client as Redis & Partial<Record<string, ScriptCommand>>)[command];
+  const invoke = (client as RedisClient & Partial<Record<string, ScriptCommand>>)[command];
 
   if (typeof invoke !== 'function') {
     throw new Error(`Turnway script "${script}" is not defined on this Redis client.`);

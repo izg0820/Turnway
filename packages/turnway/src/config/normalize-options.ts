@@ -1,3 +1,4 @@
+import { Cluster, type ClusterNode, type ClusterOptions } from 'ioredis';
 import { InvalidArgumentError } from '../errors';
 import type {
   AdmissionOptions,
@@ -105,6 +106,34 @@ export function normalizeAdmission(admission: AdmissionOptions = {}): ResolvedAd
   };
 }
 
+/** Validate startup node addresses and ports */
+function validClusterNode(node: ClusterNode): boolean {
+  const validPort = (port: unknown): boolean =>
+    typeof port === 'number' && Number.isInteger(port) && port > 0 && port <= 65535;
+  if (typeof node === 'number') return validPort(node);
+  if (typeof node === 'string') {
+    try {
+      const url = new URL(node.includes('://') ? node : `redis://${node}`);
+      return ['redis:', 'rediss:'].includes(url.protocol) && !!url.hostname &&
+        (url.port === '' || validPort(Number(url.port)));
+    } catch {
+      return false;
+    }
+  }
+  return !!node && typeof node === 'object' && !Array.isArray(node) &&
+    (node.host === undefined || (typeof node.host === 'string' && node.host.trim().length > 0)) &&
+    (node.port === undefined || validPort(node.port));
+}
+
+/** Reject Cluster prefixes that override room hash tags */
+function assertClusterPrefix(options: ClusterOptions | undefined): void {
+  for (const prefix of [options?.keyPrefix, options?.redisOptions?.keyPrefix]) {
+    if (prefix !== undefined && (typeof prefix !== 'string' || /[{}]/.test(prefix))) {
+      throw new InvalidArgumentError('Redis Cluster client keyPrefix must be a string without braces.');
+    }
+  }
+}
+
 /** Validate the Redis connection options */
 function assertRedisOptions(options: TurnwayModuleOptions): void {
   const redis = options.redis;
@@ -114,15 +143,26 @@ function assertRedisOptions(options: TurnwayModuleOptions): void {
 
   const hasClient = 'client' in redis && redis.client !== undefined;
   const hasUrl = 'url' in redis && redis.url !== undefined;
+  const hasNodes = 'startupNodes' in redis && redis.startupNodes !== undefined;
   const hasOptions = 'options' in redis && redis.options !== undefined;
 
-  if (!hasClient && !hasUrl && !hasOptions) {
-    throw new InvalidArgumentError('"redis" must provide one of "client", "url", or "options".');
+  if (!hasClient && !hasUrl && !hasOptions && !hasNodes) {
+    throw new InvalidArgumentError('"redis" must provide one of "client", "url", "startupNodes", or "options".');
   }
-  if (hasClient && (hasUrl || hasOptions)) {
+  if ((hasClient && (hasUrl || hasOptions || hasNodes)) || (hasNodes && hasUrl)) {
     throw new InvalidArgumentError(
-      '"redis.client" cannot be combined with "redis.url" or "redis.options".',
+      '"redis.client", "redis.url", and "redis.startupNodes" cannot be combined; injected clients cannot have "redis.options".',
     );
+  }
+  if ('startupNodes' in redis) {
+    if (!Array.isArray(redis.startupNodes) || redis.startupNodes.length === 0 ||
+      !redis.startupNodes.every(validClusterNode)) {
+      throw new InvalidArgumentError('"redis.startupNodes" must contain valid Redis Cluster nodes.');
+    }
+    assertClusterPrefix(redis.options);
+  }
+  if ('client' in redis && redis.client instanceof Cluster) {
+    assertClusterPrefix(redis.client.options);
   }
   if (hasUrl && typeof (redis as { url: unknown }).url !== 'string') {
     throw new InvalidArgumentError('"redis.url" must be a string.');

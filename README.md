@@ -8,8 +8,9 @@ It is intended for ticket sales, course registration, limited product drops, and
 
 > **Status: library core implemented.** Queue, admission, session lifecycle, and admission
 > verification are done and covered by unit and real-Redis integration tests
-> (`packages/turnway`). The browser demo app and the load/failure validation are not done yet,
-> and the package is not published to npm.
+> (`packages/turnway`). Room-level Redis Cluster tests and a local load-testing script are
+> available. The browser demo and production failure validation remain incomplete, and the
+> package is not published to npm.
 
 ## What it provides
 
@@ -57,4 +58,5 @@ See the [package README](packages/turnway/README.md) for setup, session settings
 - Capacity is measured in active user sessions, not requests per second.
 - A disconnected user may hold a slot until their session expires.
 - Admission follows the order in which joins are processed by Redis.
-- The initial design targets a single Redis instance. Reliability, failure recovery, and performance have not yet been validated.
+- Supports standalone Redis and room-level Redis Cluster distribution. Each room retains its own admission order and capacity limit.
+- See the [package README](packages/turnway/README.md#redis-cluster) for Cluster setup and local validation. Production failover and online resharding have not been validated.

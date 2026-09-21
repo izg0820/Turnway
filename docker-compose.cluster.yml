@@ -1,0 +1,30 @@
+services:
+  redis-cluster:
+    image: redis:7-alpine
+    mem_limit: 2g
+    ports:
+      - "127.0.0.1:6401:6401"
+      - "127.0.0.1:6402:6402"
+      - "127.0.0.1:6403:6403"
+    # Shared network namespace for local testing, not a production deployment
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        for port in 6401 6402 6403; do
+          mkdir -p /data/$$port
+          redis-server --port $$port --dir /data/$$port \
+            --daemonize yes --cluster-enabled yes --cluster-config-file nodes.conf \
+            --cluster-node-timeout 5000 --cluster-announce-ip 127.0.0.1 \
+            --cluster-announce-port $$port --cluster-announce-bus-port $$((port + 10000)) \
+            --maxmemory 512mb --maxmemory-policy noeviction \
+            --appendonly yes --appendfsync everysec --save ''
+        done
+        if ! redis-cli -p 6401 cluster info | grep -q 'cluster_state:ok'; then
+          redis-cli --cluster create 127.0.0.1:6401 127.0.0.1:6402 127.0.0.1:6403 --cluster-replicas 0 --cluster-yes
+        fi
+        exec tail -f /dev/null
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p 6401 cluster info | grep -q 'cluster_state:ok'"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
