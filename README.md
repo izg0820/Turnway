@@ -6,10 +6,12 @@ Users join a queue, check their waiting status, and enter when it is their turn.
 Services control how many users are admitted at once, while the waiting system manages the queue and admission lifecycle.
 It is intended for ticket sales, course registration, limited product drops, and other services with concentrated demand.
 
+![Three browsers sharing a room with capacity 2: two are admitted, the third waits and is admitted when one leaves](assets/demo.gif)
+
 > **Status: library core implemented.** Queue, admission, session lifecycle, and admission
 > verification are done and covered by unit and real-Redis integration tests
-> (`packages/turnway`). The browser demo app and the load/failure validation are not done yet,
-> and the package is not published to npm.
+> (`packages/turnway`). A local load-testing script and a browser demo are available.
+> Production failure validation remains incomplete, and the package is not published to npm.
 
 ## What it provides
 
@@ -52,9 +54,45 @@ before protected work.
 
 See the [package README](packages/turnway/README.md) for setup, session settings, and integration.
 
+## Demo
+
+A NestJS app in `apps/demo` serves a browser page over the module, with capacity 2 and short
+TTLs for a local walkthrough. Each browser gets a signed cookie as its user ID, so use different
+browsers or profiles to act as different users; private windows of one browser share cookies.
+That anonymous cookie is a demo shortcut: in production, take `userId` from your authenticated
+session. The cookie secret is random per process, so a restart forgets every user unless
+`DEMO_COOKIE_SECRET` (32+ characters) is set.
+
+```sh
+pnpm install
+pnpm redis:up
+pnpm demo              # http://localhost:3000
+```
+
+`pnpm demo:record` runs the scenario in the GIF with Playwright, then a simulated Redis outage
+(503s must keep the pass and recover to a single polling loop). It rewrites `assets/demo.gif`
+only when every check passes. Run `pnpm exec playwright install chromium`
+in `apps/demo` first if Chromium is missing.
+
+## Performance
+
+Local runs against one Redis with 500,000 users in the queue, calling the library directly
+(no HTTP), one run per configuration on an Apple M4 Pro:
+
+| Workload | 1 room | 30 rooms |
+|---|---|---|
+| Register 500,000 users | 10.0 s | 10.1 s |
+| 25,000 RPS check/heartbeat | p99 9.5 ms | p99 7.0 ms |
+| 50,000 RPS check/heartbeat | p99 127 ms, 0 unsent | p99 449 ms, 1.7% unsent |
+| 100,000 RPS check/heartbeat | 47% unsent | 51% unsent |
+
+A single Redis saturates near 50,000 RPS here, and 100,000 RPS was not reached. See
+[benchmarks](benchmarks/README.md) for the setup, the full tables, what was not covered, and
+the raw results.
+
 ## Current boundaries
 
 - Capacity is measured in active user sessions, not requests per second.
 - A disconnected user may hold a slot until their session expires.
 - Admission follows the order in which joins are processed by Redis.
-- The initial design targets a single Redis instance. Reliability, failure recovery, and performance have not yet been validated.
+- Targets a single Redis instance. Failure recovery has not been validated, and performance has only been measured locally (see [Performance](#performance)).

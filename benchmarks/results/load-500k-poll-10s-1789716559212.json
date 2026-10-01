@@ -1,0 +1,185 @@
+{
+  "createdAt": "2026-09-18T07:29:19.211Z",
+  "environment": {
+    "node": "v24.19.0",
+    "cpu": "Apple M4 Pro",
+    "cpuCount": 14,
+    "memory": 51539607552
+  },
+  "config": {
+    "population": 500000,
+    "durationMs": 60000,
+    "rates": [
+      50000
+    ],
+    "concurrency": 512,
+    "maxInFlight": 20000,
+    "connections": 16,
+    "cluster": false,
+    "roomIds": [
+      "sale-0"
+    ],
+    "pollIntervalMs": 10000,
+    "waitingTtlMs": 3600000,
+    "sessionTtlMs": 3600000,
+    "capacity": 5000,
+    "batchSize": 50,
+    "expiryScanLimit": 100,
+    "admissionIntervalMs": 1000,
+    "admissionScope": "all rooms sequentially per tick, skip overlapping ticks",
+    "mix": "check 100%, heartbeat 0%; users evenly staggered over 10 seconds",
+    "transport": "public service -> ioredis -> localhost Docker Redis:6400"
+  },
+  "stages": [
+    {
+      "name": "join-burst-bounded-dispatch",
+      "count": 500000,
+      "elapsedMs": 9882.912375,
+      "throughput": 50592.374092560945,
+      "serviceMs": {
+        "p50": 9.817,
+        "p95": 15.523,
+        "p99": 21.965,
+        "max": 42.258
+      },
+      "arrivalToCompletionMs": {
+        "p50": 5011.942,
+        "p95": 9430.89,
+        "p99": 9793.406,
+        "max": 9882.736
+      },
+      "stats": {
+        "waiting": 500000,
+        "admitted": 0,
+        "rooms": [
+          {
+            "roomId": "sale-0",
+            "waiting": 500000,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          }
+        ]
+      },
+      "redis": [
+        {
+          "port": 6400,
+          "info": [
+            "redis_version:7.4.11",
+            "used_memory:348850848",
+            "used_memory_rss:376627200",
+            "used_memory_peak:349374176",
+            "aof_enabled:1",
+            "aof_last_write_status:ok",
+            "aof_current_size:267698290",
+            "evicted_keys:0",
+            "total_error_replies:0",
+            "used_cpu_sys:0.773514",
+            "used_cpu_user:9.287203"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 50000,
+      "planned": 3000000,
+      "successful": 2962772,
+      "errors": 0,
+      "perUserSuccessfulPolls": {
+        "min": 5,
+        "max": 6
+      },
+      "dropped": 37228,
+      "admissionErrors": 0,
+      "elapsedMs": 60022.088292,
+      "completedWithinWindow": 2961044,
+      "withinWindowRps": 49350.73333333333,
+      "drainInclusiveRps": 49361.361530549926,
+      "latencyMs": {
+        "p50": 12.425,
+        "p95": 351.455,
+        "p99": 586.035,
+        "max": 651.131
+      },
+      "checkMs": {
+        "p50": 12.425,
+        "p95": 351.455,
+        "p99": 586.035,
+        "max": 651.131
+      },
+      "heartbeatMs": null,
+      "serviceMs": {
+        "p50": 10.539,
+        "p95": 349.823,
+        "p99": 583.054,
+        "max": 644.52
+      },
+      "schedulingMs": {
+        "p50": 1.301,
+        "p95": 3.717,
+        "p99": 7.235,
+        "max": 90.768
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 15.89,
+        "p95": 401.62,
+        "p99": 589.473,
+        "max": 589.473
+      },
+      "promotionSamples": 60,
+      "stats": {
+        "waiting": 497000,
+        "admitted": 3000,
+        "rooms": [
+          {
+            "roomId": "sale-0",
+            "waiting": 497000,
+            "admitted": 3000,
+            "capacity": 5000,
+            "availableSlots": 2000
+          }
+        ]
+      },
+      "redis": [
+        {
+          "port": 6400,
+          "info": [
+            "redis_version:7.4.11",
+            "used_memory:348938392",
+            "used_memory_rss:364232704",
+            "used_memory_peak:349374176",
+            "aof_enabled:1",
+            "aof_last_write_status:ok",
+            "aof_current_size:270410920",
+            "evicted_keys:0",
+            "total_error_replies:0",
+            "used_cpu_sys:6.152999",
+            "used_cpu_user:60.655171"
+          ]
+        }
+      ]
+    }
+  ],
+  "redisBefore": [
+    {
+      "port": 6400,
+      "info": [
+        "redis_version:7.4.11",
+        "used_memory:1736736",
+        "used_memory_rss:14327808",
+        "used_memory_peak:1736736",
+        "aof_enabled:1",
+        "aof_last_write_status:ok",
+        "aof_current_size:267",
+        "evicted_keys:0",
+        "total_error_replies:0",
+        "used_cpu_sys:0.036374",
+        "used_cpu_user:0.217145"
+      ]
+    }
+  ],
+  "finishedAt": "2026-09-18T07:30:29.995Z"
+}

@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TurnwayModule } from 'turnway';
+import { DEMO_ROOM_ID } from './constants';
+import { DemoController } from './demo.controller';
 
-/** Room id used by the demo */
-export const DEMO_ROOM_ID = 'demo-room';
-
-/** Waiting room configuration for the console demo */
+/** Waiting room configuration for the demo. Capacity, TTLs and intervals are tuned for a local walkthrough */
 @Module({
   imports: [
     TurnwayModule.forRoot({
       redis: { url: process.env.REDIS_URL ?? 'redis://127.0.0.1:6399' },
+      keyPrefix: process.env.TURNWAY_KEY_PREFIX,
       rooms: [
         {
           roomId: DEMO_ROOM_ID,
@@ -22,5 +22,6 @@ export const DEMO_ROOM_ID = 'demo-room';
       admission: { enabled: true, intervalMs: 1_000, batchSize: 10 },
     }),
   ],
+  controllers: [DemoController],
 })
 export class AppModule {}

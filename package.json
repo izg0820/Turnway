@@ -14,6 +14,7 @@
     "test:unit": "pnpm --filter turnway test:unit",
     "test:integration": "pnpm --filter turnway test:integration",
     "typecheck": "pnpm -r typecheck",
-    "demo": "pnpm --filter turnway build && pnpm --filter @turnway/demo start"
+    "demo": "pnpm --filter turnway build && pnpm --filter @turnway/demo start",
+    "demo:record": "pnpm --filter turnway build && pnpm --filter @turnway/demo record"
   }
 }

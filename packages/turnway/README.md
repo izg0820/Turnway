@@ -7,9 +7,12 @@ protected work.
 Ships a NestJS module and a framework-free entry point, so it also runs on Express, Fastify,
 Hono, or a plain script.
 
+![Three browsers sharing a room with capacity 2: two are admitted, the third waits and is admitted when one leaves](https://raw.githubusercontent.com/izg0820/TurnWay/main/assets/demo.gif)
+
 > **Status:** the library core is implemented and covered by unit and real-Redis integration
-> tests. A browser demo and load/failure validation are not yet available, and the package is
-> not published to npm.
+> tests. A local load-testing script and a [browser demo](https://github.com/izg0820/TurnWay#demo)
+> are available. Production failure validation remains incomplete, and the package is not
+> published to npm.
 
 ## Install
 
@@ -169,6 +172,13 @@ middleware, or service before calling `join()`. No Turnway-specific guard interf
 Derive `userId` from the authenticated request on every call. A `passId` identifies a pass;
 possession of it does not authenticate the caller. Verify admission with `assertAdmitted()` on
 the server before protected work, even if the client previously received an admitted status.
+
+## Performance
+
+With 500,000 users queued, one local Redis served 25,000 check/heartbeat calls per second at
+p99 9.5 ms and saturated near 50,000. These are single local runs without HTTP; see the
+[benchmarks](https://github.com/izg0820/TurnWay/blob/main/benchmarks/README.md) for conditions
+and limits.
 
 ## Current boundaries
 

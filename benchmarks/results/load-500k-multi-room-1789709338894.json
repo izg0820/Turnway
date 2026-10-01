@@ -1,0 +1,1481 @@
+{
+  "createdAt": "2026-09-18T05:28:58.894Z",
+  "environment": {
+    "node": "v24.19.0",
+    "cpu": "Apple M4 Pro",
+    "cpuCount": 14,
+    "memory": 51539607552
+  },
+  "config": {
+    "population": 500000,
+    "durationMs": 20000,
+    "rates": [
+      10000,
+      25000,
+      50000,
+      100000
+    ],
+    "concurrency": 512,
+    "maxInFlight": 20000,
+    "connections": 16,
+    "cluster": false,
+    "roomIds": [
+      "sale-0",
+      "sale-1",
+      "sale-2",
+      "sale-3",
+      "sale-4",
+      "sale-5",
+      "sale-6",
+      "sale-7",
+      "sale-8",
+      "sale-9",
+      "sale-10",
+      "sale-11",
+      "sale-12",
+      "sale-13",
+      "sale-14",
+      "sale-15",
+      "sale-16",
+      "sale-17",
+      "sale-18",
+      "sale-19",
+      "sale-20",
+      "sale-21",
+      "sale-22",
+      "sale-23",
+      "sale-24",
+      "sale-25",
+      "sale-26",
+      "sale-27",
+      "sale-28",
+      "sale-29"
+    ],
+    "waitingTtlMs": 3600000,
+    "sessionTtlMs": 3600000,
+    "capacity": 5000,
+    "batchSize": 50,
+    "expiryScanLimit": 100,
+    "admissionIntervalMs": 1000,
+    "admissionScope": "all rooms sequentially per tick, skip overlapping ticks",
+    "mix": "check 80%, heartbeat 20%",
+    "transport": "public service -> ioredis -> localhost Docker Redis:6400"
+  },
+  "stages": [
+    {
+      "name": "join-burst-bounded-dispatch",
+      "count": 500000,
+      "elapsedMs": 10056.702707999999,
+      "throughput": 49718.0849944242,
+      "serviceMs": {
+        "p50": 10.099,
+        "p95": 15.388,
+        "p99": 18.191,
+        "max": 29.072
+      },
+      "arrivalToCompletionMs": {
+        "p50": 4964.405,
+        "p95": 9546.539,
+        "p99": 9949.887,
+        "max": 10056.556
+      },
+      "stats": {
+        "waiting": 500000,
+        "admitted": 0,
+        "rooms": [
+          {
+            "roomId": "sale-0",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-1",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-2",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-3",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-4",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-5",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-6",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-7",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-8",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-9",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-10",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-11",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-12",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-13",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-14",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-15",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-16",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-17",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-18",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-19",
+            "waiting": 16667,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-20",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-21",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-22",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-23",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-24",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-25",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-26",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-27",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-28",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          },
+          {
+            "roomId": "sale-29",
+            "waiting": 16666,
+            "admitted": 0,
+            "capacity": 5000,
+            "availableSlots": 5000
+          }
+        ]
+      },
+      "redis": [
+        {
+          "port": 6400,
+          "info": [
+            "redis_version:7.4.11",
+            "used_memory:369566752",
+            "used_memory_rss:397864960",
+            "used_memory_peak:370000896",
+            "aof_enabled:1",
+            "aof_last_write_status:ok",
+            "aof_current_size:258380624",
+            "evicted_keys:0",
+            "total_error_replies:0",
+            "used_cpu_sys:0.710744",
+            "used_cpu_user:9.933260"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 10000,
+      "planned": 200000,
+      "successful": 200000,
+      "errors": 0,
+      "dropped": 0,
+      "admissionErrors": 0,
+      "elapsedMs": 20001.581375,
+      "completedWithinWindow": 199987,
+      "withinWindowRps": 9999.35,
+      "drainInclusiveRps": 9999.209375013728,
+      "latencyMs": {
+        "p50": 1.844,
+        "p95": 3.255,
+        "p99": 5.038,
+        "max": 19.262
+      },
+      "checkMs": {
+        "p50": 1.835,
+        "p95": 3.238,
+        "p99": 5.025,
+        "max": 19.262
+      },
+      "heartbeatMs": {
+        "p50": 1.883,
+        "p95": 3.319,
+        "p99": 5.077,
+        "max": 12.16
+      },
+      "serviceMs": {
+        "p50": 0.7,
+        "p95": 1.442,
+        "p99": 2.491,
+        "max": 16.621
+      },
+      "schedulingMs": {
+        "p50": 1.038,
+        "p95": 2.148,
+        "p99": 3.182,
+        "max": 12.449
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 34.833,
+        "p95": 39.221,
+        "p99": 39.221,
+        "max": 39.221
+      },
+      "promotionSamples": 19,
+      "stats": {
+        "waiting": 471500,
+        "admitted": 28500,
+        "rooms": [
+          {
+            "roomId": "sale-0",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-1",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-2",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-3",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-4",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-5",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-6",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-7",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-8",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-9",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-10",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-11",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-12",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-13",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-14",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-15",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-16",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-17",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-18",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-19",
+            "waiting": 15717,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-20",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-21",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-22",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-23",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-24",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-25",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-26",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-27",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-28",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          },
+          {
+            "roomId": "sale-29",
+            "waiting": 15716,
+            "admitted": 950,
+            "capacity": 5000,
+            "availableSlots": 4050
+          }
+        ]
+      },
+      "redis": [
+        {
+          "port": 6400,
+          "info": [
+            "redis_version:7.4.11",
+            "used_memory:368050448",
+            "used_memory_rss:389341184",
+            "used_memory_peak:370000896",
+            "aof_enabled:1",
+            "aof_last_write_status:ok",
+            "aof_current_size:303241649",
+            "evicted_keys:0",
+            "total_error_replies:0",
+            "used_cpu_sys:1.579851",
+            "used_cpu_user:15.682663"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 25000,
+      "planned": 500000,
+      "successful": 500000,
+      "errors": 0,
+      "dropped": 0,
+      "admissionErrors": 0,
+      "elapsedMs": 20031.6175,
+      "completedWithinWindow": 499958,
+      "withinWindowRps": 24997.9,
+      "drainInclusiveRps": 24960.540505528323,
+      "latencyMs": {
+        "p50": 1.843,
+        "p95": 4.263,
+        "p99": 6.98,
+        "max": 31.746
+      },
+      "checkMs": {
+        "p50": 1.803,
+        "p95": 4.21,
+        "p99": 6.879,
+        "max": 30.512
+      },
+      "heartbeatMs": {
+        "p50": 2.002,
+        "p95": 4.443,
+        "p99": 7.354,
+        "max": 31.746
+      },
+      "serviceMs": {
+        "p50": 1.132,
+        "p95": 2.624,
+        "p99": 4.774,
+        "max": 31.373
+      },
+      "schedulingMs": {
+        "p50": 0.761,
+        "p95": 1.971,
+        "p99": 3.084,
+        "max": 8.212
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 61.237,
+        "p95": 81.849,
+        "p99": 123.002,
+        "max": 123.002
+      },
+      "promotionSamples": 20,
+      "stats": {
+        "waiting": 441500,
+        "admitted": 58500,
+        "rooms": [
+          {
+            "roomId": "sale-0",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-1",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-2",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-3",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-4",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-5",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-6",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-7",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-8",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-9",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-10",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-11",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-12",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-13",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-14",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-15",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-16",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-17",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-18",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-19",
+            "waiting": 14717,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-20",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-21",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-22",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-23",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-24",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-25",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-26",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-27",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-28",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          },
+          {
+            "roomId": "sale-29",
+            "waiting": 14716,
+            "admitted": 1950,
+            "capacity": 5000,
+            "availableSlots": 3050
+          }
+        ]
+      },
+      "redis": [
+        {
+          "port": 6400,
+          "info": [
+            "redis_version:7.4.11",
+            "used_memory:358713000",
+            "used_memory_rss:386998272",
+            "used_memory_peak:370000896",
+            "aof_enabled:1",
+            "aof_last_write_status:ok",
+            "aof_current_size:203726359",
+            "evicted_keys:0",
+            "total_error_replies:0",
+            "used_cpu_sys:4.055713",
+            "used_cpu_user:26.919414"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 50000,
+      "planned": 1000000,
+      "successful": 982581,
+      "errors": 0,
+      "dropped": 17419,
+      "admissionErrors": 0,
+      "elapsedMs": 20384.471459000008,
+      "completedWithinWindow": 962803,
+      "withinWindowRps": 48140.15,
+      "drainInclusiveRps": 48202.42712578048,
+      "latencyMs": {
+        "p50": 227.196,
+        "p95": 426.888,
+        "p99": 449.253,
+        "max": 480.524
+      },
+      "checkMs": {
+        "p50": 227.225,
+        "p95": 426.902,
+        "p99": 449.248,
+        "max": 480.524
+      },
+      "heartbeatMs": {
+        "p50": 227.089,
+        "p95": 426.829,
+        "p99": 449.291,
+        "max": 480.445
+      },
+      "serviceMs": {
+        "p50": 225.752,
+        "p95": 425.207,
+        "p99": 447.558,
+        "max": 479.529
+      },
+      "schedulingMs": {
+        "p50": 1.465,
+        "p95": 4.262,
+        "p99": 6.509,
+        "max": 20.213
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 2256.146,
+        "p95": 7600.782,
+        "p99": 7600.782,
+        "max": 7600.782
+      },
+      "promotionSamples": 5,
+      "stats": {
+        "waiting": 434000,
+        "admitted": 66000,
+        "rooms": [
+          {
+            "roomId": "sale-0",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-1",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-2",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-3",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-4",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-5",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-6",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-7",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-8",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-9",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-10",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-11",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-12",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-13",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-14",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-15",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-16",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-17",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-18",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-19",
+            "waiting": 14467,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-20",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-21",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-22",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-23",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-24",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-25",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-26",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-27",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-28",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          },
+          {
+            "roomId": "sale-29",
+            "waiting": 14466,
+            "admitted": 2200,
+            "capacity": 5000,
+            "availableSlots": 2800
+          }
+        ]
+      },
+      "redis": [
+        {
+          "port": 6400,
+          "info": [
+            "redis_version:7.4.11",
+            "used_memory:358798664",
+            "used_memory_rss:388177920",
+            "used_memory_peak:370000896",
+            "aof_enabled:1",
+            "aof_last_write_status:ok",
+            "aof_current_size:300700815",
+            "evicted_keys:0",
+            "total_error_replies:0",
+            "used_cpu_sys:4.586414",
+            "used_cpu_user:46.786336"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 100000,
+      "planned": 2000000,
+      "successful": 987532,
+      "errors": 0,
+      "dropped": 1012468,
+      "admissionErrors": 0,
+      "elapsedMs": 20364.840540999998,
+      "completedWithinWindow": 967532,
+      "withinWindowRps": 48376.6,
+      "drainInclusiveRps": 48492.00748770057,
+      "latencyMs": {
+        "p50": 409.74,
+        "p95": 428.856,
+        "p99": 437.867,
+        "max": 450.679
+      },
+      "checkMs": {
+        "p50": 409.727,
+        "p95": 428.855,
+        "p99": 437.818,
+        "max": 450.359
+      },
+      "heartbeatMs": {
+        "p50": 409.795,
+        "p95": 428.861,
+        "p99": 438.053,
+        "max": 450.679
+      },
+      "serviceMs": {
+        "p50": 407.353,
+        "p95": 426.355,
+        "p99": 435.425,
+        "max": 447.671
+      },
+      "schedulingMs": {
+        "p50": 2.295,
+        "p95": 5.318,
+        "p99": 6.84,
+        "max": 12.122
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 6357.391,
+        "p95": 12167.56,
+        "p99": 12167.56,
+        "max": 12167.56
+      },
+      "promotionSamples": 2,
+      "stats": {
+        "waiting": 431000,
+        "admitted": 69000,
+        "rooms": [
+          {
+            "roomId": "sale-0",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-1",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-2",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-3",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-4",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-5",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-6",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-7",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-8",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-9",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-10",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-11",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-12",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-13",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-14",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-15",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-16",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-17",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-18",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-19",
+            "waiting": 14367,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-20",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-21",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-22",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-23",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-24",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-25",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-26",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-27",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-28",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          },
+          {
+            "roomId": "sale-29",
+            "waiting": 14366,
+            "admitted": 2300,
+            "capacity": 5000,
+            "availableSlots": 2700
+          }
+        ]
+      },
+      "redis": [
+        {
+          "port": 6400,
+          "info": [
+            "redis_version:7.4.11",
+            "used_memory:358670680",
+            "used_memory_rss:388440064",
+            "used_memory_peak:370000896",
+            "aof_enabled:1",
+            "aof_last_write_status:ok",
+            "aof_current_size:393863758",
+            "evicted_keys:0",
+            "total_error_replies:0",
+            "used_cpu_sys:5.318413",
+            "used_cpu_user:66.430602"
+          ]
+        }
+      ]
+    }
+  ],
+  "redisBefore": [
+    {
+      "port": 6400,
+      "info": [
+        "redis_version:7.4.11",
+        "used_memory:1740040",
+        "used_memory_rss:14950400",
+        "used_memory_peak:1750136",
+        "aof_enabled:1",
+        "aof_last_write_status:ok",
+        "aof_current_size:7363",
+        "evicted_keys:0",
+        "total_error_replies:0",
+        "used_cpu_sys:0.092029",
+        "used_cpu_user:0.497456"
+      ]
+    }
+  ],
+  "finishedAt": "2026-09-18T05:30:30.660Z"
+}

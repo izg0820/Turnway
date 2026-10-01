@@ -1,0 +1,372 @@
+{
+  "createdAt": "2026-09-17T05:05:09.152Z",
+  "environment": {
+    "node": "v24.19.0",
+    "cpu": "Apple M4 Pro",
+    "cpuCount": 14,
+    "memory": 51539607552
+  },
+  "config": {
+    "population": 500000,
+    "durationMs": 20000,
+    "rates": [
+      10000,
+      25000,
+      50000,
+      100000
+    ],
+    "concurrency": 512,
+    "maxInFlight": 20000,
+    "connections": 16,
+    "waitingTtlMs": 3600000,
+    "sessionTtlMs": 3600000,
+    "capacity": 5000,
+    "batchSize": 50,
+    "expiryScanLimit": 100,
+    "admissionIntervalMs": 1000,
+    "mix": "check 80%, heartbeat 20%",
+    "transport": "public service -> ioredis -> localhost Docker Redis:6400"
+  },
+  "stages": [
+    {
+      "name": "join-burst-bounded-dispatch",
+      "count": 500000,
+      "elapsedMs": 10044.493499999999,
+      "throughput": 49778.51795115404,
+      "serviceMs": {
+        "p50": 9.887,
+        "p95": 15.962,
+        "p99": 21.049,
+        "max": 56.587
+      },
+      "arrivalToCompletionMs": {
+        "p50": 4985.108,
+        "p95": 9589.796,
+        "p99": 9957.934,
+        "max": 10044.45
+      },
+      "stats": {
+        "roomId": "sale",
+        "waiting": 500000,
+        "admitted": 0,
+        "capacity": 5000,
+        "availableSlots": 5000
+      },
+      "redis": [
+        "redis_version:7.4.11",
+        "used_memory:349735104",
+        "used_memory_rss:376528896",
+        "used_memory_peak:350250648",
+        "aof_enabled:1",
+        "aof_last_write_status:ok",
+        "aof_current_size:258168437",
+        "evicted_keys:0",
+        "total_error_replies:0",
+        "used_cpu_sys:0.890093",
+        "used_cpu_user:10.121660"
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 10000,
+      "planned": 200000,
+      "successful": 200000,
+      "errors": 0,
+      "dropped": 0,
+      "admissionErrors": 0,
+      "elapsedMs": 20001.224583000003,
+      "completedWithinWindow": 199976,
+      "withinWindowRps": 9998.8,
+      "drainInclusiveRps": 9999.387745987791,
+      "latencyMs": {
+        "p50": 1.926,
+        "p95": 4.011,
+        "p99": 9.343,
+        "max": 23.685
+      },
+      "checkMs": {
+        "p50": 1.938,
+        "p95": 4.019,
+        "p99": 9.345,
+        "max": 23.685
+      },
+      "heartbeatMs": {
+        "p50": 1.881,
+        "p95": 3.985,
+        "p99": 9.332,
+        "max": 23.625
+      },
+      "serviceMs": {
+        "p50": 0.751,
+        "p95": 1.797,
+        "p99": 3.342,
+        "max": 20.076
+      },
+      "schedulingMs": {
+        "p50": 1.076,
+        "p95": 2.55,
+        "p99": 6.176,
+        "max": 20.77
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 1.422,
+        "p95": 2.293,
+        "p99": 2.293,
+        "max": 2.293
+      },
+      "promotionSamples": 19,
+      "stats": {
+        "roomId": "sale",
+        "waiting": 499050,
+        "admitted": 950,
+        "capacity": 5000,
+        "availableSlots": 4050
+      },
+      "redis": [
+        "redis_version:7.4.11",
+        "used_memory:349545120",
+        "used_memory_rss:365498368",
+        "used_memory_peak:350250648",
+        "aof_enabled:1",
+        "aof_last_write_status:ok",
+        "aof_current_size:277800843",
+        "evicted_keys:0",
+        "total_error_replies:0",
+        "used_cpu_sys:1.864943",
+        "used_cpu_user:15.384512"
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 25000,
+      "planned": 500000,
+      "successful": 500000,
+      "errors": 0,
+      "dropped": 0,
+      "admissionErrors": 0,
+      "elapsedMs": 20002.1405,
+      "completedWithinWindow": 499965,
+      "withinWindowRps": 24998.25,
+      "drainInclusiveRps": 24997.32466132812,
+      "latencyMs": {
+        "p50": 1.804,
+        "p95": 4.261,
+        "p99": 9.458,
+        "max": 38.995
+      },
+      "checkMs": {
+        "p50": 1.803,
+        "p95": 4.259,
+        "p99": 9.456,
+        "max": 38.995
+      },
+      "heartbeatMs": {
+        "p50": 1.81,
+        "p95": 4.27,
+        "p99": 9.463,
+        "max": 37.781
+      },
+      "serviceMs": {
+        "p50": 1.117,
+        "p95": 2.526,
+        "p99": 6.87,
+        "max": 26.878
+      },
+      "schedulingMs": {
+        "p50": 0.753,
+        "p95": 1.946,
+        "p99": 3.312,
+        "max": 23.287
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 1.536,
+        "p95": 2.177,
+        "p99": 2.42,
+        "max": 2.42
+      },
+      "promotionSamples": 20,
+      "stats": {
+        "roomId": "sale",
+        "waiting": 498050,
+        "admitted": 1950,
+        "capacity": 5000,
+        "availableSlots": 3050
+      },
+      "redis": [
+        "redis_version:7.4.11",
+        "used_memory:349519968",
+        "used_memory_rss:365629440",
+        "used_memory_peak:350250648",
+        "aof_enabled:1",
+        "aof_last_write_status:ok",
+        "aof_current_size:325629109",
+        "evicted_keys:0",
+        "total_error_replies:0",
+        "used_cpu_sys:4.271721",
+        "used_cpu_user:25.907543"
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 50000,
+      "planned": 1000000,
+      "successful": 1000000,
+      "errors": 0,
+      "dropped": 0,
+      "admissionErrors": 0,
+      "elapsedMs": 20004.117208000003,
+      "completedWithinWindow": 999692,
+      "withinWindowRps": 49984.6,
+      "drainInclusiveRps": 49989.70909848909,
+      "latencyMs": {
+        "p50": 14.131,
+        "p95": 107.996,
+        "p99": 126.849,
+        "max": 152.981
+      },
+      "checkMs": {
+        "p50": 14.135,
+        "p95": 107.993,
+        "p99": 126.849,
+        "max": 152.981
+      },
+      "heartbeatMs": {
+        "p50": 14.116,
+        "p95": 108.003,
+        "p99": 126.848,
+        "max": 152.341
+      },
+      "serviceMs": {
+        "p50": 12.506,
+        "p95": 106.466,
+        "p99": 125.475,
+        "max": 151.239
+      },
+      "schedulingMs": {
+        "p50": 1.342,
+        "p95": 3.19,
+        "p99": 5.288,
+        "max": 12.408
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 19.695,
+        "p95": 114.475,
+        "p99": 114.475,
+        "max": 114.475
+      },
+      "promotionSamples": 19,
+      "stats": {
+        "roomId": "sale",
+        "waiting": 497100,
+        "admitted": 2900,
+        "capacity": 5000,
+        "availableSlots": 2100
+      },
+      "redis": [
+        "redis_version:7.4.11",
+        "used_memory:349576472",
+        "used_memory_rss:366415872",
+        "used_memory_peak:350250648",
+        "aof_enabled:1",
+        "aof_last_write_status:ok",
+        "aof_current_size:249226849",
+        "evicted_keys:0",
+        "total_error_replies:0",
+        "used_cpu_sys:5.241602",
+        "used_cpu_user:44.658925"
+      ]
+    },
+    {
+      "name": "mixed-open-loop",
+      "rate": 100000,
+      "planned": 2000000,
+      "successful": 1067224,
+      "errors": 0,
+      "dropped": 932776,
+      "admissionErrors": 0,
+      "elapsedMs": 20333.135374999998,
+      "completedWithinWindow": 1047224,
+      "withinWindowRps": 52361.2,
+      "drainInclusiveRps": 52486.937224259746,
+      "latencyMs": {
+        "p50": 378.312,
+        "p95": 401.662,
+        "p99": 412.369,
+        "max": 437.043
+      },
+      "checkMs": {
+        "p50": 378.309,
+        "p95": 401.657,
+        "p99": 412.357,
+        "max": 437.043
+      },
+      "heartbeatMs": {
+        "p50": 378.322,
+        "p95": 401.689,
+        "p99": 412.417,
+        "max": 436.403
+      },
+      "serviceMs": {
+        "p50": 375.607,
+        "p95": 399.08,
+        "p99": 409.794,
+        "max": 435.529
+      },
+      "schedulingMs": {
+        "p50": 2.375,
+        "p95": 5.978,
+        "p99": 8.35,
+        "max": 13.972
+      },
+      "errorMs": null,
+      "errorMessages": {},
+      "promotionMs": {
+        "p50": 387.481,
+        "p95": 416.087,
+        "p99": 418.077,
+        "max": 418.077
+      },
+      "promotionSamples": 20,
+      "stats": {
+        "roomId": "sale",
+        "waiting": 496100,
+        "admitted": 3900,
+        "capacity": 5000,
+        "availableSlots": 1100
+      },
+      "redis": [
+        "redis_version:7.4.11",
+        "used_memory:349604384",
+        "used_memory_rss:366522368",
+        "used_memory_peak:350250648",
+        "aof_enabled:1",
+        "aof_last_write_status:ok",
+        "aof_current_size:350191112",
+        "evicted_keys:0",
+        "total_error_replies:0",
+        "used_cpu_sys:5.892676",
+        "used_cpu_user:64.357549"
+      ]
+    }
+  ],
+  "redisBefore": [
+    "redis_version:7.4.11",
+    "used_memory:2859800",
+    "used_memory_rss:16281600",
+    "used_memory_peak:2867048",
+    "aof_enabled:1",
+    "aof_last_write_status:ok",
+    "aof_current_size:1157426",
+    "evicted_keys:0",
+    "total_error_replies:0",
+    "used_cpu_sys:0.194565",
+    "used_cpu_user:0.817106"
+  ],
+  "finishedAt": "2026-09-17T05:06:40.372Z"
+}

@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Turnway demo</title>
+  <style>
+    :root {
+      --bg: #f4f5f7; --card: #fff; --text: #1d2330; --muted: #6b7280; --line: #e5e7eb;
+      --waiting: #d97706; --waiting-bg: #fef3c7; --admitted: #059669; --admitted-bg: #d1fae5;
+      --ended: #6b7280; --ended-bg: #f3f4f6; --error: #dc2626; --error-bg: #fee2e2; --accent: #2563eb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, sans-serif; }
+    main { max-width: 360px; margin: 0 auto; padding: 20px 16px; }
+    header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    h1 { font-size: 17px; margin: 0; }
+    .user { color: var(--muted); font-size: 12px; font-family: ui-monospace, monospace; }
+    .stats { display: flex; gap: 8px; margin-bottom: 12px; }
+    .stat { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+    .stat b { display: block; font-size: 20px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .slots { display: flex; gap: 4px; margin-top: 4px; }
+    .slot { width: 12px; height: 12px; border-radius: 3px; background: var(--line); }
+    .slot.on { background: var(--admitted); }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; text-align: center; }
+    .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+    .WAITING .badge { color: var(--waiting); background: var(--waiting-bg); }
+    .ADMITTED .badge { color: var(--admitted); background: var(--admitted-bg); }
+    .LEFT .badge, .EXPIRED .badge, .IDLE .badge { color: var(--ended); background: var(--ended-bg); }
+    .big { font-size: 44px; font-weight: 700; margin: 10px 0 2px; }
+    .WAITING .big { color: var(--waiting); }
+    .ADMITTED .big { color: var(--admitted); }
+    .text { color: var(--muted); margin: 0 0 16px; min-height: 2.9em; }
+    button { width: 100%; padding: 11px; border-radius: 10px; border: 0; font: inherit; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    button.primary { background: var(--accent); color: #fff; }
+    button.secondary { background: var(--ended-bg); color: var(--text); }
+    button:disabled { opacity: .5; cursor: default; }
+    .result { margin-top: 12px; padding: 10px; border-radius: 10px; background: var(--admitted-bg); color: var(--admitted); font-weight: 600; }
+    .result.denied { background: var(--error-bg); color: var(--error); }
+    .banner { margin-bottom: 12px; padding: 8px 12px; border-radius: 10px; background: var(--error-bg); color: var(--error); font-size: 13px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Turnway demo</h1>
+    <span class="user" id="user"></span>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><b id="admitted">–</b><span>admitted</span><div class="slots" id="slots"></div></div>
+    <div class="stat"><b id="waiting">–</b><span>waiting</span></div>
+  </div>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <section class="card IDLE" id="card">
+    <span class="badge" id="badge">NOT IN LINE</span>
+    <div class="big" id="big">–</div>
+    <p class="text" id="text">Two people can be inside at once. Everyone else waits in line.</p>
+    <button class="primary" id="join">Join the queue</button>
+    <button class="primary" id="protected" hidden>Reserve a seat</button>
+    <button class="secondary" id="leave" hidden>Leave</button>
+    <button class="primary" id="retry" hidden>Retry connection</button>
+    <div class="result" id="result" hidden></div>
+  </section>
+</main>
+
+<script>
+  // Polling and heartbeat intervals are demo settings: heartbeats must arrive well within the 30 s TTL
+  const PASS_KEY = 'turnway-demo-pass';
+  const POLL_MS = 1000;
+  const HEARTBEAT_MS = 5000;
+  const MAX_FAILURES = 5;
+
+  const $ = (id) => document.getElementById(id);
+  let passId = localStorage.getItem(PASS_KEY);
+  let status = null;
+  let failures = 0;
+  let lastHeartbeat = 0;
+  let busy = false;
+  let timer = null;
+  let polling = false;
+  let result = null;
+
+  const isLive = () => status && (status.state === 'WAITING' || status.state === 'ADMITTED');
+
+  async function api(method, path) {
+    const res = await fetch(path, { method, headers: { accept: 'application/json' } });
+    const body = await res.json().catch(() => ({}));
+    if (res.status >= 500) throw new Error(body.code ?? `HTTP ${res.status}`);
+    return { ok: res.ok, status: res.status, body };
+  }
+
+  function forgetPass() {
+    passId = null;
+    localStorage.removeItem(PASS_KEY);
+  }
+
+  // A missing or foreign pass means the pass is gone, never that it expired
+  function applyPass(res) {
+    if (res.ok) {
+      status = res.body;
+      if (!isLive()) forgetPass();
+      return;
+    }
+    forgetPass();
+    status = null;
+  }
+
+  // At most one loop: a tick is either scheduled (timer) or running (polling)
+  function startPolling() {
+    if (!polling && timer === null && failures < MAX_FAILURES) tick();
+  }
+
+  async function tick() {
+    timer = null;
+    polling = true;
+    try {
+      const stats = await api('GET', '/api/stats');
+      renderStats(stats.body);
+      const polled = passId;
+      if (polled && !busy) {
+        const due = Date.now() - lastHeartbeat >= HEARTBEAT_MS;
+        const res = due
+          ? await api('POST', `/api/passes/${encodeURIComponent(polled)}/heartbeat`)
+          : await api('GET', `/api/passes/${encodeURIComponent(polled)}`);
+        if (due && res.ok) lastHeartbeat = Date.now();
+        // Drop a reply that a join or leave finished during this request has superseded
+        if (!busy && passId === polled) applyPass(res);
+      }
+      failures = 0;
+    } catch {
+      failures += 1;
+    }
+    polling = false;
+    render();
+    if (failures < MAX_FAILURES) timer = setTimeout(tick, POLL_MS);
+  }
+
+  async function act(fn) {
+    if (busy) return;
+    busy = true;
+    render();
+    try {
+      await fn();
+      failures = 0;
+    } catch {
+      failures += 1;
+    } finally {
+      busy = false;
+      render();
+      // The loop may have given up while this action was in flight
+      startPolling();
+    }
+  }
+
+  const join = () => act(async () => {
+    const res = await api('POST', '/api/join');
+    result = null;
+    if (!res.ok) return;
+    status = res.body;
+    passId = status.passId;
+    localStorage.setItem(PASS_KEY, passId);
+    lastHeartbeat = Date.now();
+  });
+
+  const leave = () => act(async () => {
+    applyPass(await api('POST', `/api/passes/${encodeURIComponent(passId)}/leave`));
+    result = null;
+  });
+
+  // The server decides; the button being visible grants nothing
+  const runProtected = () => act(async () => {
+    const res = await api('POST', `/api/passes/${encodeURIComponent(passId)}/protected`);
+    result = res.ok ? { ok: true, text: res.body.result } : { ok: false, text: `Denied: ${res.body.code}` };
+  });
+
+  function retry() {
+    failures = 0;
+    render();
+    startPolling();
+  }
+
+  function renderStats(stats) {
+    $('admitted').textContent = `${stats.admitted} / ${stats.capacity}`;
+    $('waiting').textContent = stats.waiting;
+    $('slots').replaceChildren(...Array.from({ length: stats.capacity }, (_, i) => {
+      const slot = document.createElement('i');
+      slot.className = i < stats.admitted ? 'slot on' : 'slot';
+      return slot;
+    }));
+  }
+
+  const VIEWS = {
+    IDLE: ['NOT IN LINE', '–', 'Two people can be inside at once. Everyone else waits in line.'],
+    WAITING: ['WAITING', null, 'You will be let in automatically when a slot opens.'],
+    ADMITTED: ['ADMITTED', "You're in", 'The server verifies your admission before every protected action.'],
+    LEFT: ['LEFT', 'Bye', 'You left and your slot went to the next person in line.'],
+    EXPIRED: ['EXPIRED', 'Expired', 'No heartbeat arrived in time, so the pass expired.'],
+  };
+
+  function render() {
+    const state = status?.state ?? 'IDLE';
+    const [badge, big, text] = VIEWS[state];
+    $('card').className = `card ${state}`;
+    $('user').textContent = status ? `user ${status.userId.slice(0, 8)}` : '';
+    $('badge').textContent = badge;
+    $('big').textContent = state === 'WAITING' ? `#${status.position}` : big;
+    $('text').textContent = text;
+
+    const offline = failures >= MAX_FAILURES;
+    $('banner').hidden = failures === 0;
+    $('banner').textContent = offline
+      ? 'The waiting room is unreachable. Your place is kept on the server until the pass expires.'
+      : 'Connection problem, retrying…';
+
+    $('join').hidden = isLive() || offline;
+    $('join').textContent = status ? 'Join again' : 'Join the queue';
+    $('protected').hidden = state !== 'ADMITTED' || offline;
+    $('leave').hidden = !isLive() || offline;
+    $('leave').textContent = state === 'WAITING' ? 'Leave the queue' : 'Leave';
+    $('retry').hidden = !offline;
+    for (const id of ['join', 'protected', 'leave']) $(id).disabled = busy;
+
+    $('result').hidden = !result || state !== 'ADMITTED';
+    $('result').className = result?.ok ? 'result' : 'result denied';
+    $('result').textContent = result?.text ?? '';
+  }
+
+  $('join').onclick = join;
+  $('leave').onclick = leave;
+  $('protected').onclick = runProtected;
+  $('retry').onclick = retry;
+  render();
+  startPolling();
+</script>
+</body>
+</html>
