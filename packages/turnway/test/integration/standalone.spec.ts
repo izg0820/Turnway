@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createTurnway, type Turnway } from '../../src/standalone';
 import { deleteKeys, REDIS_URL, silentLogger, TEST_ROOM_ID, testRoom } from './harness';
 
-describe('Phase 01 — NestJS 없이 사용', () => {
+describe('Phase 01 — usage without NestJS', () => {
   let room: Turnway;
   let keyPrefix: string;
 
@@ -27,7 +27,7 @@ describe('Phase 01 — NestJS 없이 사용', () => {
     await cleanup.quit();
   });
 
-  it('참여부터 퇴장까지 모듈 없이 동작', async () => {
+  it('works from join to leave without the module', async () => {
 
     const pass = await room.service.join(TEST_ROOM_ID, 'user-1');
     const checked = await room.service.check(TEST_ROOM_ID, 'user-1', pass.passId);
@@ -40,7 +40,7 @@ describe('Phase 01 — NestJS 없이 사용', () => {
     expect(left.state).toBe('LEFT');
   });
 
-  it('반환 시점에 설정 등록이 끝나 있음', async () => {
+  it('room configuration is registered by the time it resolves', async () => {
     const probe = new Redis(REDIS_URL);
     const config = await probe.hgetall(`${keyPrefix}:{${TEST_ROOM_ID}}:config`);
     await probe.quit();
@@ -48,7 +48,7 @@ describe('Phase 01 — NestJS 없이 사용', () => {
     expect(config.capacity).toBe(String(testRoom().capacity));
   });
 
-  it('close() 는 소유한 연결까지 정리', async () => {
+  it('close() also closes the owned connection', async () => {
     await room.close();
 
     // Calling it again after it is already closed must not throw
@@ -56,8 +56,8 @@ describe('Phase 01 — NestJS 없이 사용', () => {
   });
 });
 
-describe('Phase 01 — standalone 진입점의 의존성', () => {
-  it('@nestjs 패키지를 하나도 로드하지 않음', () => {
+describe('Phase 01 — standalone entry point dependencies', () => {
+  it('loads no @nestjs packages', () => {
     // Load the build output in a separate process to inspect the real require graph
     const script = `
       require('./dist/standalone.js');

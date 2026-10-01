@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { createHarness, TEST_ROOM_ID, testRoom, type Harness } from './harness';
 
-describe('만료 데이터 정리와 유효 정원 계산 분리', () => {
+describe('expired data cleanup is separate from live capacity', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe('만료 데이터 정리와 유효 정원 계산 분리', () => {
     return key;
   }
 
-  it('정리되지 않은 만료 세션이 있어도 입장 후 빈자리를 정확히 반환', async () => {
+  it('reports free slots correctly after admission despite uncleaned expired sessions', async () => {
     const key = await expireAdmittedSessions();
     const next = await harness.service.join(TEST_ROOM_ID, 'next');
 
@@ -41,7 +41,7 @@ describe('만료 데이터 정리와 유효 정원 계산 분리', () => {
     });
   });
 
-  it('만료 적체 중 동시 입장 작업도 유효 정원만큼 선착순 입장', async () => {
+  it('concurrent admission runs during an expiry backlog admit in order up to live capacity', async () => {
     const key = await expireAdmittedSessions();
     // Restore an expired backlog exceeding the cleanup limit after joins have pruned it
     const passes = [];

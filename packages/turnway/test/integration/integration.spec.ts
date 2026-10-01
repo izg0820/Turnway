@@ -16,7 +16,7 @@ import {
   type Harness,
 } from './harness';
 
-describe('Phase 04 — 입장 검증', () => {
+describe('Phase 04 — admission verification', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -27,7 +27,7 @@ describe('Phase 04 — 입장 검증', () => {
     await harness.close();
   });
 
-  it('입장한 사용자에게 활성 세션을 반환', async () => {
+  it('returns the active session for an admitted user', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.runAdmission(TEST_ROOM_ID);
 
@@ -38,7 +38,7 @@ describe('Phase 04 — 입장 검증', () => {
     expect(session.expiresAt).toBeGreaterThan(session.admittedAt);
   });
 
-  it('대기 중인 사용자의 보호 기능 접근 차단', async () => {
+  it('blocks protected work for a waiting user', async () => {
     await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.join(TEST_ROOM_ID, 'user-2');
     const third = await harness.service.join(TEST_ROOM_ID, 'user-3');
@@ -53,7 +53,7 @@ describe('Phase 04 — 입장 검증', () => {
     expect((error as NotAdmittedError).status.state).toBe('WAITING');
   });
 
-  it('퇴장한 대기표 접근 차단', async () => {
+  it('blocks access with a pass that has left', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.runAdmission(TEST_ROOM_ID);
     await harness.service.leave(TEST_ROOM_ID, 'user-1', pass.passId);
@@ -66,7 +66,7 @@ describe('Phase 04 — 입장 검증', () => {
     expect((error as NotAdmittedError).status.state).toBe('LEFT');
   });
 
-  it('타인 대기표와 알 수 없는 대기표 접근 차단', async () => {
+  it('blocks access with a pass owned by another user or an unknown pass', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.runAdmission(TEST_ROOM_ID);
 
@@ -78,7 +78,7 @@ describe('Phase 04 — 입장 검증', () => {
     ).rejects.toBeInstanceOf(PassNotFoundError);
   });
 
-  it('검증은 세션을 연장하거나 추가 정원을 소비하지 않음', async () => {
+  it('verification neither extends the session nor consumes extra capacity', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.runAdmission(TEST_ROOM_ID);
 
@@ -90,7 +90,7 @@ describe('Phase 04 — 입장 검증', () => {
     expect((await harness.service.stats(TEST_ROOM_ID)).admitted).toBe(1);
   });
 
-  it('참여부터 퇴장까지 전체 흐름을 서비스 호출만으로 실행', async () => {
+  it('runs the whole flow from join to leave through service calls alone', async () => {
     // 1. join
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     expect(pass.state).toBe('WAITING');
@@ -120,7 +120,7 @@ describe('Phase 04 — 입장 검증', () => {
   });
 });
 
-describe('Phase 04 — 대기열·소유자 격리', () => {
+describe('Phase 04 — room and owner isolation', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -131,7 +131,7 @@ describe('Phase 04 — 대기열·소유자 격리', () => {
     await harness.close();
   });
 
-  it('다른 대기열의 대기표로는 입장 검증 불가', async () => {
+  it('a pass from another room cannot pass verification', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.runAdmission(TEST_ROOM_ID);
 
@@ -140,7 +140,7 @@ describe('Phase 04 — 대기열·소유자 격리', () => {
     ).rejects.toBeInstanceOf(PassNotFoundError);
   });
 
-  it('타인 대기표로는 연장·퇴장도 불가', async () => {
+  it('a pass owned by another user can neither extend nor leave', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
     await expect(
@@ -155,8 +155,8 @@ describe('Phase 04 — 대기열·소유자 격리', () => {
   });
 });
 
-describe('Phase 04 — 만료된 세션 검증', () => {
-  it('만료 시각이 지난 입장 세션은 청소 전이라도 접근 차단', async () => {
+describe('Phase 04 — verifying expired sessions', () => {
+  it('blocks an admitted session past its expiry even before cleanup', async () => {
     const harness = await createHarness({ rooms: [testRoom({ sessionTtlMs: 300 })] });
 
     try {
@@ -176,8 +176,8 @@ describe('Phase 04 — 만료된 세션 검증', () => {
   });
 });
 
-describe('Phase 04 — 저장소 장애', () => {
-  it('Redis 접근 실패를 입장 성공으로 처리하지 않음', async () => {
+describe('Phase 04 — storage failure', () => {
+  it('does not treat a Redis failure as a successful admission', async () => {
     // inject an external connection with the offline queue disabled so failures surface at once
     const client = await waitForReady(
       new Redis(REDIS_URL, { enableOfflineQueue: false, maxRetriesPerRequest: 1 }),
@@ -209,7 +209,7 @@ describe('Phase 04 — 저장소 장애', () => {
     }
   });
 
-  it('재연결 이후 처리 재개', async () => {
+  it('resumes after reconnecting', async () => {
     const client = await waitForReady(
       new Redis(REDIS_URL, { enableOfflineQueue: false, maxRetriesPerRequest: 1 }),
     );

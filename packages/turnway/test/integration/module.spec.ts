@@ -28,8 +28,8 @@ function moduleOptions(overrides: Partial<TurnwayModuleOptions> = {}): TurnwayMo
   };
 }
 
-describe('Phase 01 — 모듈 등록과 설정 검증', () => {
-  it('잘못된 설정은 초기화 단계에서 실패', async () => {
+describe('Phase 01 — module registration and option validation', () => {
+  it('invalid options fail during initialization', async () => {
     const build = Test.createTestingModule({
       imports: [TurnwayModule.forRoot(moduleOptions({ rooms: [testRoom({ capacity: 0 })] }))],
     }).compile();
@@ -37,7 +37,7 @@ describe('Phase 01 — 모듈 등록과 설정 검증', () => {
     await expect(build).rejects.toBeInstanceOf(InvalidArgumentError);
   });
 
-  it('대기열 설정이 이미 다르게 적용돼 있으면 초기화 실패', async () => {
+  it('initialization fails when the room is already configured differently', async () => {
     const keyPrefix = `turnway-conflict-${randomUUID().slice(0, 8)}`;
     const first = await Test.createTestingModule({
       imports: [TurnwayModule.forRoot(moduleOptions({ keyPrefix }))],
@@ -67,7 +67,7 @@ describe('Phase 01 — 모듈 등록과 설정 검증', () => {
     }
   });
 
-  it('같은 설정으로 여러 인스턴스를 띄우는 것은 허용', async () => {
+  it('allows several instances with the same configuration', async () => {
     const keyPrefix = `turnway-same-${randomUUID().slice(0, 8)}`;
     const first = await Test.createTestingModule({
       imports: [TurnwayModule.forRoot(moduleOptions({ keyPrefix }))],
@@ -87,8 +87,8 @@ describe('Phase 01 — 모듈 등록과 설정 검증', () => {
   });
 });
 
-describe('Phase 01 — 연결 소유권', () => {
-  it('라이브러리가 만든 연결은 모듈 종료 시 정리', async () => {
+describe('Phase 01 — connection ownership', () => {
+  it('closes connections the library created when the module shuts down', async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [TurnwayModule.forRoot(moduleOptions())],
     }).compile();
@@ -103,7 +103,7 @@ describe('Phase 01 — 연결 소유권', () => {
     expect(connection.client.status).toBe('end');
   });
 
-  it('초기화가 실패해도 소유한 연결을 남기지 않음', async () => {
+  it('leaves no owned connection behind when initialization fails', async () => {
     // register a different capacity for the same room so init fails
     const keyPrefix = `turnway-init-fail-${randomUUID().slice(0, 8)}`;
     const first = await Test.createTestingModule({
@@ -130,7 +130,7 @@ describe('Phase 01 — 연결 소유권', () => {
     await first.close();
   });
 
-  it('외부에서 주입한 연결은 모듈 종료 후에도 유지', async () => {
+  it('keeps an injected connection open after the module shuts down', async () => {
     const client = await waitForReady(new Redis(REDIS_URL));
     const moduleRef = await Test.createTestingModule({
       imports: [TurnwayModule.forRoot(moduleOptions({ redis: { client } }))],
@@ -148,8 +148,8 @@ describe('Phase 01 — 연결 소유권', () => {
   });
 });
 
-describe('Phase 01 — 클라이언트 키 접두사', () => {
-  it('주입한 연결의 keyPrefix 가 다르면 대기열 전체가 분리', async () => {
+describe('Phase 01 — client key prefix', () => {
+  it('injected connections with different keyPrefix values keep rooms fully separate', async () => {
     // same room id and keyPrefix, only the client prefix differs
     const keyPrefix = `turnway-client-prefix-${randomUUID().slice(0, 8)}`;
     const clientA = await waitForReady(new Redis(REDIS_URL, { keyPrefix: 'tenant-a:' }));
@@ -191,8 +191,8 @@ describe('Phase 01 — 클라이언트 키 접두사', () => {
   });
 });
 
-describe('Phase 01 — 비동기 등록', () => {
-  it('useFactory 로 옵션을 주입', async () => {
+describe('Phase 01 — async registration', () => {
+  it('provides options with useFactory', async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [
         TurnwayModule.forRootAsync({
@@ -208,7 +208,7 @@ describe('Phase 01 — 비동기 등록', () => {
     await moduleRef.close();
   });
 
-  it('inject 로 넘긴 토큰이 순서대로 useFactory 인자가 됨', async () => {
+  it('tokens in inject become useFactory arguments in order', async () => {
     // two providers the factory must receive in order
     const PREFIX = Symbol('PREFIX');
 
@@ -248,7 +248,7 @@ describe('Phase 01 — 비동기 등록', () => {
     await moduleRef.close();
   });
 
-  it('useClass 로 옵션 팩토리를 주입', async () => {
+  it('provides an options factory with useClass', async () => {
     class OptionsProvider implements TurnwayOptionsFactory {
       createTurnwayOptions(): TurnwayModuleOptions {
         return moduleOptions();
@@ -274,7 +274,7 @@ describe('Phase 01 — 비동기 등록', () => {
     await moduleRef.close();
   });
 
-  it('옵션 제공 방법이 없으면 등록 자체를 거부', () => {
+  it('rejects registration without a way to provide options', () => {
     expect(() => TurnwayModule.forRootAsync({})).toThrow(/useFactory/);
   });
 });

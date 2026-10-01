@@ -7,7 +7,7 @@ import {
 } from '../../src/errors';
 import { createHarness, sleep, TEST_ROOM_ID, testRoom, type Harness } from './harness';
 
-describe('Phase 02 — 대기 참여와 상태 조회', () => {
+describe('Phase 02 — joining and checking status', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -18,7 +18,7 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
     await harness.close();
   });
 
-  it('같은 사용자의 동시 참여가 하나의 유효 대기표로 수렴', async () => {
+  it('concurrent joins by the same user converge on one live pass', async () => {
 
     const attempts = 20;
 
@@ -33,7 +33,7 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
     expect(waiting).toBe(1);
   });
 
-  it('서로 다른 사용자 순번이 Redis 처리 순서와 일치', async () => {
+  it('sequence numbers of different users follow Redis processing order', async () => {
 
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     const second = await harness.service.join(TEST_ROOM_ID, 'user-2');
@@ -45,7 +45,7 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
     expect(third).toMatchObject({ state: 'WAITING', position: 3 });
   });
 
-  it('동시 참여에서도 순번 중복과 대기 인덱스 누락이 없음', async () => {
+  it('concurrent joins produce no duplicate sequences or missing queue entries', async () => {
 
     const results = await Promise.all(
       Array.from({ length: 30 }, (_, index) =>
@@ -61,7 +61,7 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
     expect(waiting).toBe(30);
   });
 
-  it('타인 대기표 조회 거부', async () => {
+  it('rejects checking a pass owned by another user', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
     await expect(harness.service.check(TEST_ROOM_ID, 'user-2', pass.passId)).rejects.toBeInstanceOf(
@@ -69,25 +69,25 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
     );
   });
 
-  it('알 수 없는 대기표는 구별 가능한 오류로 전달', async () => {
+  it('reports an unknown pass with a distinct error', async () => {
     await expect(
       harness.service.check(TEST_ROOM_ID, 'user-1', 'no-such-pass'),
     ).rejects.toBeInstanceOf(PassNotFoundError);
   });
 
-  it('등록되지 않은 대기열 호출 거부', async () => {
+  it('rejects calls to an unregistered room', async () => {
     await expect(harness.service.join('unknown-room', 'user-1')).rejects.toBeInstanceOf(
       RoomNotRegisteredError,
     );
   });
 
-  it('키 구조를 깨는 식별자 거부', async () => {
+  it('rejects identifiers that would break the key layout', async () => {
     await expect(harness.service.join(TEST_ROOM_ID, 'user 1')).rejects.toBeInstanceOf(
       InvalidArgumentError,
     );
   });
 
-  it('종료 후 재참여는 새 대기표와 새 순번을 받고 이전 대기표 청소에 지워지지 않음', async () => {
+  it('rejoining after finishing gets a new pass and sequence that cleanup of the old pass does not remove', async () => {
 
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.leave(TEST_ROOM_ID, 'user-1', first.passId);
@@ -105,7 +105,7 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
     expect(mapped).toBe(second.passId);
   });
 
-  it('입장한 사용자의 재참여 요청은 기존 입장 세션을 그대로 반환', async () => {
+  it('rejoining while admitted returns the existing admitted session', async () => {
 
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.runAdmission(TEST_ROOM_ID);
@@ -118,7 +118,7 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
     expect((await harness.service.stats(TEST_ROOM_ID)).admitted).toBe(1);
   });
 
-  it('퇴장 후 상태 조회는 종료 상태를 반환하고 반복 퇴장에도 변하지 않음', async () => {
+  it('checking after leaving returns the terminal state, unchanged by repeated leaves', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
     const left = await harness.service.leave(TEST_ROOM_ID, 'user-1', pass.passId);
@@ -130,7 +130,7 @@ describe('Phase 02 — 대기 참여와 상태 조회', () => {
   });
 });
 
-describe('Phase 02 — 대기 만료', () => {
+describe('Phase 02 — waiting expiry', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -141,7 +141,7 @@ describe('Phase 02 — 대기 만료', () => {
     await harness.close();
   });
 
-  it('만료 시각이 지난 대기표는 청소 작업 전이라도 만료로 판정', async () => {
+  it('a pass past its expiry is reported expired even before cleanup', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
     await sleep(350);
@@ -150,7 +150,7 @@ describe('Phase 02 — 대기 만료', () => {
     expect(status.state).toBe('EXPIRED');
   });
 
-  it('만료 시각이 지난 대기표의 퇴장 요청은 만료로 확정', async () => {
+  it('leaving with a pass past its expiry settles it as expired', async () => {
     // cleanup has not run, so the hash still reads WAITING
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await sleep(350);
@@ -161,7 +161,7 @@ describe('Phase 02 — 대기 만료', () => {
     expect(left.state).toBe('EXPIRED');
   });
 
-  it('만료 후 재참여는 새 대기표를 발급', async () => {
+  it('rejoining after expiry issues a new pass', async () => {
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await sleep(350);
 
@@ -171,7 +171,7 @@ describe('Phase 02 — 대기 만료', () => {
     expect(second.state).toBe('WAITING');
   });
 
-  it('하트비트로 대기 세션을 연장', async () => {
+  it('a heartbeat extends the waiting pass', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
     await sleep(200);
@@ -184,7 +184,7 @@ describe('Phase 02 — 대기 만료', () => {
   });
 });
 
-describe('Phase 02 — 대기열 격리', () => {
+describe('Phase 02 — room isolation', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -197,7 +197,7 @@ describe('Phase 02 — 대기열 격리', () => {
     await harness.close();
   });
 
-  it('다른 대기열의 대기표 조회 거부', async () => {
+  it('rejects checking a pass from another room', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
     await expect(
@@ -205,7 +205,7 @@ describe('Phase 02 — 대기열 격리', () => {
     ).rejects.toBeInstanceOf(PassNotFoundError);
   });
 
-  it('같은 사용자가 서로 다른 대기열에는 각각 참여', async () => {
+  it('the same user can join different rooms separately', async () => {
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     const second = await harness.service.join('other-room', 'user-1');
 

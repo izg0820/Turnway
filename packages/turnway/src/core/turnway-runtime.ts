@@ -4,8 +4,8 @@ import type { ResolvedTurnwayOptions, WaitingRoomLogger } from '../types/options
 import type { TurnwayStore } from './turnway.store';
 
 /**
- * NestJS 런타임 의존성 없이 수명주기 훅 제공
- * NestJS 모듈과 standalone 팩토리의 시작·종료 순서 공유
+ * Lifecycle hooks without a NestJS runtime dependency.
+ * Shares the startup and shutdown order between the NestJS module and the standalone factory.
  */
 export class TurnwayRuntime {
   constructor(

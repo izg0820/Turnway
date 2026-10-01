@@ -11,7 +11,7 @@ function waitingKey(harness: Harness): string {
   return `${harness.keyPrefix}:{${TEST_ROOM_ID}}:waiting`;
 }
 
-describe('Phase 03 — 만료 정리 예산 배분', () => {
+describe('Phase 03 — expiry cleanup budget', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -26,7 +26,7 @@ describe('Phase 03 — 만료 정리 예산 배분', () => {
     await harness.close();
   });
 
-  it('만료된 대기표가 쌓여 있어도 만료된 입장 세션이 정원을 계속 점유하지 않음', async () => {
+  it('expired admitted sessions stop holding capacity even with a backlog of expired passes', async () => {
     // one admitted session, one live waiter at the head, two stale waiters behind it
     const admitted = await harness.service.join(TEST_ROOM_ID, 'user-a');
     await harness.service.runAdmission(TEST_ROOM_ID);
@@ -53,7 +53,7 @@ describe('Phase 03 — 만료 정리 예산 배분', () => {
   });
 });
 
-describe('Phase 03 — 입장과 정원', () => {
+describe('Phase 03 — admission and capacity', () => {
   let harness: Harness;
 
   beforeEach(async () => {
@@ -64,7 +64,7 @@ describe('Phase 03 — 입장과 정원', () => {
     await harness.close();
   });
 
-  it('정원만큼만 선착순으로 입장', async () => {
+  it('admits in arrival order up to capacity', async () => {
     // capacity 2
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     const second = await harness.service.join(TEST_ROOM_ID, 'user-2');
@@ -86,7 +86,7 @@ describe('Phase 03 — 입장과 정원', () => {
     });
   });
 
-  it('정원이 찼으면 추가 입장 없음', async () => {
+  it('admits no one when capacity is full', async () => {
     await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.join(TEST_ROOM_ID, 'user-2');
     await harness.service.join(TEST_ROOM_ID, 'user-3');
@@ -98,7 +98,7 @@ describe('Phase 03 — 입장과 정원', () => {
     expect(await harness.redis.zcard(activeKey(harness))).toBe(2);
   });
 
-  it('여러 인스턴스가 동시에 승급해도 정원 초과와 순서 역전 없음', async () => {
+  it('concurrent promotion from several instances neither exceeds capacity nor reorders', async () => {
     // a second instance sharing the same room
     const shared = await createHarness({ keyPrefix: harness.keyPrefix });
 
@@ -140,7 +140,7 @@ describe('Phase 03 — 입장과 정원', () => {
     }
   });
 
-  it('퇴장하면 다음 대기자가 다음 작업에서 입장', async () => {
+  it('after a leave, the next waiter is admitted on the next run', async () => {
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.join(TEST_ROOM_ID, 'user-2');
     const third = await harness.service.join(TEST_ROOM_ID, 'user-3');
@@ -155,7 +155,7 @@ describe('Phase 03 — 입장과 정원', () => {
     );
   });
 
-  it('취소와 승급이 경합해도 대기·활성 양쪽에 남지 않음', async () => {
+  it('a cancel racing a promotion leaves the pass in neither the queue nor the active set', async () => {
     const pass = await harness.service.join(TEST_ROOM_ID, 'user-1');
 
     await Promise.all([
@@ -169,7 +169,7 @@ describe('Phase 03 — 입장과 정원', () => {
     expect(await harness.redis.zscore(activeKey(harness), pass.passId)).toBeNull();
   });
 
-  it('통계는 만료 인덱스를 반영한 유효 인원만 계산', async () => {
+  it('stats count only live entries according to the expiry index', async () => {
     const first = await harness.service.join(TEST_ROOM_ID, 'user-1');
     await harness.service.join(TEST_ROOM_ID, 'user-2');
     await harness.service.join(TEST_ROOM_ID, 'user-3');
@@ -184,8 +184,8 @@ describe('Phase 03 — 입장과 정원', () => {
   });
 });
 
-describe('Phase 03 — 세션 만료와 하트비트', () => {
-  it('만료된 입장 세션은 하트비트로 부활하지 않음', async () => {
+describe('Phase 03 — session expiry and heartbeats', () => {
+  it('a heartbeat does not revive an expired admitted session', async () => {
     const harness = await createHarness({ rooms: [testRoom({ sessionTtlMs: 300 })] });
 
     try {
@@ -203,7 +203,7 @@ describe('Phase 03 — 세션 만료와 하트비트', () => {
     }
   });
 
-  it('하트비트로 최대 체류 시간을 넘길 수 없음', async () => {
+  it('heartbeats cannot extend past the maximum session duration', async () => {
     const harness = await createHarness({
       rooms: [testRoom({ sessionTtlMs: 400, maxSessionDurationMs: 600 })],
     });
@@ -231,7 +231,7 @@ describe('Phase 03 — 세션 만료와 하트비트', () => {
     }
   });
 
-  it('만료된 입장 세션이 정리되면 다음 대기자가 입장', async () => {
+  it('the next waiter is admitted once an expired session is cleaned up', async () => {
     const harness = await createHarness({
       rooms: [testRoom({ capacity: 1, sessionTtlMs: 300 })],
     });
@@ -255,8 +255,8 @@ describe('Phase 03 — 세션 만료와 하트비트', () => {
   });
 });
 
-describe('Phase 03 — 배치 제한과 백그라운드 작업', () => {
-  it('한 번에 입장시키는 수를 배치 크기로 제한', async () => {
+describe('Phase 03 — batch limits and the background worker', () => {
+  it('limits admissions per run to the batch size', async () => {
     const harness = await createHarness({
       rooms: [testRoom({ capacity: 10 })],
       admission: { enabled: false, intervalMs: 50, batchSize: 3, expiryScanLimit: 50 },
@@ -278,7 +278,7 @@ describe('Phase 03 — 배치 제한과 백그라운드 작업', () => {
     }
   });
 
-  it('대량 만료도 제한된 배치로 정리하면서 후속 입장 진행', async () => {
+  it('cleans up mass expiry in bounded batches while admissions continue', async () => {
     const harness = await createHarness({
       rooms: [testRoom({ capacity: 1 })],
       admission: { enabled: false, intervalMs: 50, batchSize: 1, expiryScanLimit: 1 },
@@ -319,7 +319,7 @@ describe('Phase 03 — 배치 제한과 백그라운드 작업', () => {
     }
   });
 
-  it('자동 실행 작업이 참여 호출 없이도 대기자를 승급하고 종료 시 정리', async () => {
+  it('the background worker promotes waiters without join calls and stops on shutdown', async () => {
     const harness = await createHarness({
       admission: { enabled: true, intervalMs: 30, batchSize: 10, expiryScanLimit: 50 },
     });
